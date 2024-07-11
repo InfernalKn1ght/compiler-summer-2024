@@ -1,12 +1,31 @@
 #include "parser.h"
 
+#include <cstddef>
 #include <stdexcept>
 
+namespace {
+bool is_whitespace(char c) {
+	switch (c) {
+	case ' ':
+		return 1;
+		break;
+	case '\n':
+		return 1;
+		break;
+	case '\t':
+		return 1;
+		break;
+	default:
+		return 0;
+		break;
+	}
+}
+}
+
 namespace AST {
-Econst Parser::get_const() {
+Econst Parser::get_const(){
     std::string acc;
     const size_t size = str.size();
-    size_t pos = 0;
     while (pos < size && std::isdigit(str[pos])) {
 		acc += str[pos];
 		pos++;
@@ -18,15 +37,14 @@ Econst Parser::get_const() {
     } else {
 		// TODO: исправить костыль с -1
 		throw std::invalid_argument("String is not a digit: " + str);
-		Econst result(0);
+		Econst result(-1);
 		return result;
     }
 };
 
-std::string Parser::get_keyword_or_ident() {
+std::string Parser::get_keyword_or_ident(){
     std::string acc;
     const size_t size = str.size();
-    size_t pos = 0;
     while (pos < size && std::isalpha(str[pos])) {
 		acc += str[pos];
 		pos++;
@@ -39,7 +57,7 @@ std::string Parser::get_keyword_or_ident() {
     return acc;
 };
 
-std::string Parser::get_keyword() {
+const std::string Parser::get_keyword(){
     try {
 		std::string result = get_keyword_or_ident();
 		if (Parser(result).is_keyword()) {
@@ -54,7 +72,7 @@ std::string Parser::get_keyword() {
     }
 };
 
-std::string Parser::get_ident() {
+const std::string Parser::get_ident() {
 	//TODO Переписать понятнее
     try {
 		std::string result = get_keyword_or_ident();
@@ -69,5 +87,11 @@ std::string Parser::get_ident() {
 		return "";
     }
 };
+
+void Parser::ws() {
+    while (pos < str.size() && is_whitespace(str[pos])) {
+        ++pos;
+    }
+}
 
 }  // namespace AST
