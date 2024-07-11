@@ -1,12 +1,20 @@
 #pragma once
+
+#include "ast.h"
 #include <string>
 
-extern std::string text;
-extern int pos;
+namespace AST {
+class Parser {
+	private:
+		const std::string str;
+		bool is_keyword();
+		std::string get_keyword_or_ident();
 
-bool is_whitespace(char c);
-void ws();
-int econst();
-bool is_keyword(std::string s);
-std::string ident_or_keyword();
-std::string ident();
+	public:
+		Parser(const std::string& str) : str(str) {};
+		Econst get_const();
+
+		std::string get_ident();
+		std::string get_keyword();
+};
+}
