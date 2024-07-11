@@ -27,3 +27,38 @@ void ws() {
     }
 }
 
+int econst() {
+    std::string acc;
+    while (pos < text.size() && isdigit(text[pos])) {
+        acc.push_back(text[pos]);
+        ++pos;
+    }
+
+    if (acc.size() > 0) {
+        return std::stoi(acc);
+    } else {
+        return -1;
+    }
+}
+
+std::string ident_or_keyword() {
+    std::string acc;
+    while (pos < text.size() && isalpha(text[pos])) {
+        acc.push_back(text[pos]);
+        ++pos;
+    }
+    if (acc.size() > 0) {
+        return acc;
+    } else {
+        return "-1";
+    }
+}
+
+std::string ident() {
+    std::string s = ident_or_keyword();
+    if (is_keyword(s)) {
+        return "-1";
+    } else {
+        return s;
+    }
+}
