@@ -14,10 +14,11 @@ class Parser {
 		void ws();
 
 	public:
-		Parser(const std::string& str) : str(str) {};
+		Parser(const std::string& str) : str(str), pos(0) {};
 		Econst get_const();
 
 		const std::string get_ident();
 		const std::string get_keyword();
+		const Operator get_operator();
 };
 }
