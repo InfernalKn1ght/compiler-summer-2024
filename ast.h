@@ -13,7 +13,10 @@ class Econst : public Expr {
 		int val;
 };
 
-enum Operator { ADD, SUM, MUL };
+//TODO
+// Надо бы сделать это дело расширяемым, чтобы не менять несколько объектов при добавлении нового оператора
+// А если оператор из нескольких символов ?
+enum Operator { PLUS='+', MINUS='-', MULTIPLICATION='*' };
 
 class EBinop : public Expr {
 	public:

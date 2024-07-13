@@ -1,6 +1,7 @@
 #include "parser.h"
-
+#include "ast.h"
 #include <cstddef>
+#include <iostream>
 #include <stdexcept>
 
 namespace {
@@ -24,6 +25,7 @@ bool is_whitespace(char c) {
 
 namespace AST {
 Econst Parser::get_const(){
+	ws();
     std::string acc;
     const size_t size = str.size();
     while (pos < size && std::isdigit(str[pos])) {
@@ -35,14 +37,12 @@ Econst Parser::get_const(){
 		Econst result(acc);
 		return result;
     } else {
-		// TODO: исправить костыль с -1
-		throw std::invalid_argument("String is not a digit: " + str);
-		Econst result(-1);
-		return result;
+		throw std::invalid_argument("String is not a digit: " + str.substr(pos));
     }
 };
 
 std::string Parser::get_keyword_or_ident(){
+	ws();
     std::string acc;
     const size_t size = str.size();
     while (pos < size && std::isalpha(str[pos])) {
@@ -51,7 +51,7 @@ std::string Parser::get_keyword_or_ident(){
     }
 
     if (acc.size() == 0) {
-		throw std::invalid_argument("String is not a keyword or ident: " + str);
+		throw std::invalid_argument("String is not a keyword or ident: " + str.substr(pos));
     }
 
     return acc;
@@ -64,11 +64,9 @@ const std::string Parser::get_keyword(){
 			return result;
 		} else {
 			throw std::invalid_argument("String is not a keyword: " + str);
-			return "";
 		};
     } catch (std::invalid_argument) {
 		throw std::invalid_argument("String is not a keyword: " + str);
-		return "";
     }
 };
 
@@ -80,11 +78,9 @@ const std::string Parser::get_ident() {
 			return result;
 		} else {
 			throw std::invalid_argument("String is not a ident: " + str);
-			return "";
 		};
     } catch (std::invalid_argument) {
 		throw std::invalid_argument("String is not a ident: " + str);
-		return "";
     }
 };
 
@@ -94,4 +90,24 @@ void Parser::ws() {
     }
 }
 
+bool Parser::is_keyword(){
+	return false;
+}
+
+const Operator Parser::get_operator(){
+	ws();
+	//TODO - А если оператор не char а string 
+	char symbol = str[pos];
+	switch (symbol) {
+	case '+':
+	case '-':
+	case '*':
+		pos++;
+		return Operator(symbol);
+		break;
+	default:
+		throw std::invalid_argument("Char is not a operator" + str.substr(pos, 1));
+		break;
+	}
+}
 }  // namespace AST
