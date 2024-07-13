@@ -5,11 +5,14 @@
 #include <string>
 
 namespace AST {
+
+bool is_keyword(std::string);
+bool is_ident(std::string);
+
 class Parser {
 	private:
 		const std::string str;
 		std::size_t pos;
-		bool is_keyword();
 		std::string get_keyword_or_ident();
 		void ws();
 

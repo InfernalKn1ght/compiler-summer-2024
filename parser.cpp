@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
 namespace {
 bool is_whitespace(char c) {
@@ -24,6 +25,14 @@ bool is_whitespace(char c) {
 }
 
 namespace AST {
+bool is_keyword(std::string str){
+	return false;
+};
+
+bool is_ident(std::string str){
+	return (!is_keyword(str));
+};
+
 Econst Parser::get_const(){
 	ws();
     std::string acc;
@@ -33,12 +42,12 @@ Econst Parser::get_const(){
 		pos++;
     }
 
-    if (acc.size() > 0) {
-		Econst result(acc);
-		return result;
-    } else {
+    if (acc.size() == 0) {
 		throw std::invalid_argument("String is not a digit: " + str.substr(pos));
-    }
+	}
+
+	Econst result(acc);
+	return result;
 };
 
 std::string Parser::get_keyword_or_ident(){
@@ -60,27 +69,22 @@ std::string Parser::get_keyword_or_ident(){
 const std::string Parser::get_keyword(){
     try {
 		std::string result = get_keyword_or_ident();
-		if (Parser(result).is_keyword()) {
+		if (is_keyword(result))
 			return result;
-		} else {
-			throw std::invalid_argument("String is not a keyword: " + str);
-		};
+		throw std::invalid_argument("String is not a keyword: " + str.substr(pos));
     } catch (std::invalid_argument) {
-		throw std::invalid_argument("String is not a keyword: " + str);
+		throw std::invalid_argument("String is not a keyword: " + str.substr(pos));
     }
 };
 
 const std::string Parser::get_ident() {
-	//TODO Переписать понятнее
     try {
 		std::string result = get_keyword_or_ident();
-		if (!Parser(result).is_keyword()) {
+		if (is_ident(result))
 			return result;
-		} else {
-			throw std::invalid_argument("String is not a ident: " + str);
-		};
+		throw std::invalid_argument("String is not a ident: " + str.substr(pos));
     } catch (std::invalid_argument) {
-		throw std::invalid_argument("String is not a ident: " + str);
+		throw std::invalid_argument("String is not a ident: " + str.substr(pos));
     }
 };
 
@@ -88,10 +92,6 @@ void Parser::ws() {
     while (pos < str.size() && is_whitespace(str[pos])) {
         ++pos;
     }
-}
-
-bool Parser::is_keyword(){
-	return false;
 }
 
 const Operator Parser::get_operator(){
