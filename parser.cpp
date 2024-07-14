@@ -33,10 +33,9 @@ bool is_ident(std::string str){
 	return (!is_keyword(str));
 };
 
-Econst Parser::get_const(){
+const Econst Parser::get_const(){
 	ws();
     std::string acc;
-    const size_t size = str.size();
     while (pos < size && std::isdigit(str[pos])) {
 		acc += str[pos];
 		pos++;
@@ -53,7 +52,6 @@ Econst Parser::get_const(){
 std::string Parser::get_keyword_or_ident(){
 	ws();
     std::string acc;
-    const size_t size = str.size();
     while (pos < size && std::isalpha(str[pos])) {
 		acc += str[pos];
 		pos++;
@@ -89,7 +87,7 @@ const std::string Parser::get_ident() {
 };
 
 void Parser::ws() {
-    while (pos < str.size() && is_whitespace(str[pos])) {
+    while (pos < size && is_whitespace(str[pos])) {
         ++pos;
     }
 }
