@@ -24,5 +24,6 @@ class Parser {
 		const std::string get_ident();
 		const std::string get_keyword();
 		const Operator get_operator();
+		Expr *expr();
 };
 }
