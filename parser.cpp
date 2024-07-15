@@ -1,7 +1,9 @@
 #include "parser.h"
 #include "ast.h"
 #include <cstddef>
+#include <exception>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 
@@ -109,24 +111,27 @@ namespace AST {
         }
     }
 
-    Expr *Parser::expr() {
-        Econst *head = new Econst(0);
+	std::unique_ptr<Expr> Parser::expr() {
+		std::unique_ptr<Econst> head;
         try {
-            *head = get_const();
-        } catch (std::invalid_argument) {
-            throw std::invalid_argument("Invalid operand");
+			head = std::make_unique<Econst>(get_const());
+        } catch (std::exception &e) {
+            throw e;
         }
 
-        int pos1 = pos;
+        size_t init_pos = pos;
 
         try {
             Operator op = get_operator();
-            EBinop *new_root = new EBinop(head, expr(), op);
-            return new_root;
-
+			std::unique_ptr<EBinop> new_root = std::make_unique<EBinop>(
+				std::move(head),
+				std::move(expr()),
+				op
+			);
+			return std::move(new_root);
         } catch (std::invalid_argument) {
-            pos = pos1;
-            return head;
+            pos = init_pos;
+            return std::move(head);
         }
     }
 

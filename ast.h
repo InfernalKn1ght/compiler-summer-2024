@@ -1,10 +1,15 @@
 #pragma once
 
+#include <algorithm>
+#include <memory>
 #include <string>
 
 namespace AST {
 
-class Expr {};
+class Expr {
+public:
+	virtual ~Expr() = default;
+};
 
 class Econst : public Expr {
 	public:
@@ -13,17 +18,14 @@ class Econst : public Expr {
 		int val;
 };
 
-//TODO
-// Надо бы сделать это дело расширяемым, чтобы не менять несколько объектов при добавлении нового оператора
-// А если оператор из нескольких символов ?
 enum Operator { PLUS='+', MINUS='-', MULTIPLICATION='*' };
 
 class EBinop : public Expr {
 	public:
-		EBinop(Expr* left, Expr* right, Operator op)
-		: left(left), right(right), op(op) {};
-		Expr* left;
-		Expr* right;
+		EBinop(std::unique_ptr<Expr> left, std::unique_ptr<Expr> right, Operator op) :
+			left(std::move(left)), right(std::move(right)), op(op) {};
+		std::unique_ptr<Expr> left;
+		std::unique_ptr<Expr> right;
 		Operator op;
 };
 }
