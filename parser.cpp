@@ -7,8 +7,8 @@
 #include <stdexcept>
 #include <string>
 
-namespace {
-    bool is_whitespace(char c) {
+namespace AST {
+    bool Parser::is_whitespace(char c) {
         switch (c) {
         case ' ':
             return 1;
@@ -23,15 +23,13 @@ namespace {
             return 0;
             break;
         }
-    }
-}
+    };
 
-namespace AST {
-    bool is_keyword(std::string str) {
+    bool Parser::is_keyword(std::string str) {
         return false;
     };
 
-    bool is_ident(std::string str) {
+    bool Parser::is_ident(std::string str) {
         return (!is_keyword(str));
     };
 
@@ -123,7 +121,7 @@ namespace AST {
     }
 
 	std::unique_ptr<Expr> Parser::expr() {
-		std::unique_ptr<EConst> head;
+		std::unique_ptr<Expr> head;
         try {
 			head = std::make_unique<EConst>(get_const());
         } catch (std::exception &e) {
@@ -134,11 +132,11 @@ namespace AST {
 
         try {
             UnaryOperator op = get_unary_operator();
-			std::unique_ptr<EUnaryOp> new_root = std::make_unique<EUnaryOp>(
+			std::unique_ptr<EUnaryOp> new_head = std::make_unique<EUnaryOp>(
 				std::move(head),
 				op
 			);
-			return std::move(new_root);
+			head = std::move(new_head);
         } catch (std::invalid_argument &e) {}
 
         try {
@@ -154,17 +152,4 @@ namespace AST {
 		pos = init_pos;
 		return std::move(head);
     }
-
-
-	const std::string EBinOp::record() const{
-		//TODO
-		return " ";
-	}
-
-
-	const std::string EUnaryOp::record() const{
-		//TODO
-		return " ";
-	}
-
 } // namespace AST

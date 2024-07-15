@@ -3,6 +3,11 @@
 #include <iostream>
 
 namespace AST {
+	/**
+	 * @brief ВАЖНО - вызов функции полностью стирает дерево
+	 *	
+	 * @param expr Корень AST дерева
+	 */
 	void pretty_print(std::unique_ptr<Expr> expr){
 	if (AST::EConst* econ = dynamic_cast<AST::EConst*>(expr.get())){
 		std::cout << econ->val;
@@ -15,4 +20,16 @@ namespace AST {
 		std::cout << char(eunop->op);
 	}
 	};
+
+	const std::string EBinOp::record() const{
+		//TODO
+		return " ";
+	}
+
+
+	const std::string EUnaryOp::record() const{
+		//TODO
+		return " ";
+	}
+
 }
