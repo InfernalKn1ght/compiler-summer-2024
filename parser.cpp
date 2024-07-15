@@ -35,7 +35,7 @@ namespace AST {
         return (!is_keyword(str));
     };
 
-    const Econst Parser::get_const() {
+    const EConst Parser::get_const() {
         ws();
         std::string acc;
         while (pos < size && std::isdigit(str[pos])) {
@@ -47,7 +47,7 @@ namespace AST {
             throw std::invalid_argument("String is not a digit: " + str.substr(pos));
         }
 
-        Econst result(acc);
+        EConst result(acc);
         return result;
     };
 
@@ -94,7 +94,7 @@ namespace AST {
         }
     }
 
-    const Operator Parser::get_operator() {
+    const BinaryOperator Parser::get_binary_operator() {
         ws();
         // TODO - А если оператор не char а string
         char symbol = str[pos];
@@ -103,18 +103,29 @@ namespace AST {
         case '-':
         case '*':
             pos++;
-            return Operator(symbol);
-            break;
+            return BinaryOperator(symbol);
         default:
             throw std::invalid_argument("Char is not a operator" + str.substr(pos, 1));
-            break;
+        }
+    }
+
+    const UnaryOperator Parser::get_unary_operator() {
+        ws();
+        // TODO - А если оператор не char а string
+        char symbol = str[pos];
+        switch (symbol) {
+        case '!':
+            pos++;
+            return UnaryOperator(symbol);
+        default:
+            throw std::invalid_argument("Char is not a operator" + str.substr(pos, 1));
         }
     }
 
 	std::unique_ptr<Expr> Parser::expr() {
-		std::unique_ptr<Econst> head;
+		std::unique_ptr<EConst> head;
         try {
-			head = std::make_unique<Econst>(get_const());
+			head = std::make_unique<EConst>(get_const());
         } catch (std::exception &e) {
             throw e;
         }
@@ -122,17 +133,38 @@ namespace AST {
         size_t init_pos = pos;
 
         try {
-            Operator op = get_operator();
-			std::unique_ptr<EBinop> new_root = std::make_unique<EBinop>(
+            UnaryOperator op = get_unary_operator();
+			std::unique_ptr<EUnaryOp> new_root = std::make_unique<EUnaryOp>(
+				std::move(head),
+				op
+			);
+			return std::move(new_root);
+        } catch (std::invalid_argument &e) {}
+
+        try {
+            BinaryOperator op = get_binary_operator();
+			std::unique_ptr<EBinOp> new_root = std::make_unique<EBinOp>(
 				std::move(head),
 				std::move(expr()),
 				op
 			);
 			return std::move(new_root);
-        } catch (std::invalid_argument) {
-            pos = init_pos;
-            return std::move(head);
-        }
+        } catch (std::invalid_argument &e) {}
+
+		pos = init_pos;
+		return std::move(head);
     }
+
+
+	const std::string EBinOp::record() const{
+		//TODO
+		return " ";
+	}
+
+
+	const std::string EUnaryOp::record() const{
+		//TODO
+		return " ";
+	}
 
 } // namespace AST
