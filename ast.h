@@ -45,4 +45,7 @@ class EUnaryOp : public EOperator {
 
 		const std::string record() const;
 };
+
+void pretty_print(std::unique_ptr<Expr>);
+
 }
