@@ -4,12 +4,14 @@
 
 namespace AST {
 
-class AST {
+class AstBuilder {
 	private:
 		Parser p;
+		std::unique_ptr<Expr> EConst_head();
+
 
 	public:
-		AST(std::string);
+		AstBuilder(std::string str): p(str) {};
 		std::unique_ptr<Expr> get_root();
 
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include <cstddef>
 #include <string>
 #include <memory>
 
@@ -15,14 +16,16 @@ class Parser {
 		bool is_variable(std::string);
 		bool is_whitespace(char);
 		void ws();
+
+	public:
+		Parser(const std::string& str) : str(str), pos(0), size(str.size()) {};
 		const EConst get_const();
 		const std::string get_variable();
 		const std::string get_keyword();
 		const BinaryOperator get_binary_operation();
 		const UnaryOperator get_unary_operation();
 
-	public:
-		Parser(const std::string& str) : str(str), pos(0), size(str.size()) {};
-		std::unique_ptr<Expr> expr();
+		std::size_t get_pos(){return pos;};
+		void set_pos(std::size_t new_pos) {pos = new_pos;};
 };
 }

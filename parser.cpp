@@ -120,36 +120,4 @@ namespace AST {
         }
     }
 
-	std::unique_ptr<Expr> Parser::expr() {
-		std::unique_ptr<Expr> head;
-        try {
-			head = std::make_unique<EConst>(get_const());
-        } catch (std::exception &e) {
-            throw e;
-        }
-
-        size_t init_pos = pos;
-
-        try {
-            UnaryOperator op = get_unary_operation();
-			std::unique_ptr<EUnaryOp> new_head = std::make_unique<EUnaryOp>(
-				std::move(head),
-				op
-			);
-			head = std::move(new_head);
-        } catch (std::invalid_argument &e) {}
-
-        try {
-            BinaryOperator op = get_binary_operation();
-			std::unique_ptr<EBinOp> new_root = std::make_unique<EBinOp>(
-				std::move(head),
-				std::move(expr()),
-				op
-			);
-			return std::move(new_root);
-        } catch (std::invalid_argument &e) {}
-
-		pos = init_pos;
-		return std::move(head);
-    }
 } // namespace AST
