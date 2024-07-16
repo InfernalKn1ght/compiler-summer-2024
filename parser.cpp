@@ -1,7 +1,7 @@
 #include "parser.h"
-#include "ast.h"
+#include "types.h"
+
 #include <cstddef>
-#include <exception>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -29,7 +29,7 @@ namespace AST {
         return false;
     };
 
-    bool Parser::is_ident(std::string str) {
+    bool Parser::is_variable(std::string str) {
         return (!is_keyword(str));
     };
 
@@ -75,14 +75,14 @@ namespace AST {
         }
     };
 
-    const std::string Parser::get_ident() {
+    const std::string Parser::get_variable() {
         try {
             std::string result = get_keyword_or_ident();
-            if (is_ident(result))
+            if (is_variable(result))
                 return result;
-            throw std::invalid_argument("String is not a ident: " + str.substr(pos));
+            throw std::invalid_argument("String is not a variable: " + str.substr(pos));
         } catch (std::invalid_argument) {
-            throw std::invalid_argument("String is not a ident: " + str.substr(pos));
+            throw std::invalid_argument("String is not a variable: " + str.substr(pos));
         }
     };
 
@@ -92,7 +92,7 @@ namespace AST {
         }
     }
 
-    const BinaryOperator Parser::get_binary_operator() {
+    const BinaryOperator Parser::get_binary_operation() {
         ws();
         // TODO - А если оператор не char а string
         char symbol = str[pos];
@@ -107,7 +107,7 @@ namespace AST {
         }
     }
 
-    const UnaryOperator Parser::get_unary_operator() {
+    const UnaryOperator Parser::get_unary_operation() {
         ws();
         // TODO - А если оператор не char а string
         char symbol = str[pos];
@@ -131,7 +131,7 @@ namespace AST {
         size_t init_pos = pos;
 
         try {
-            UnaryOperator op = get_unary_operator();
+            UnaryOperator op = get_unary_operation();
 			std::unique_ptr<EUnaryOp> new_head = std::make_unique<EUnaryOp>(
 				std::move(head),
 				op
@@ -140,7 +140,7 @@ namespace AST {
         } catch (std::invalid_argument &e) {}
 
         try {
-            BinaryOperator op = get_binary_operator();
+            BinaryOperator op = get_binary_operation();
 			std::unique_ptr<EBinOp> new_root = std::make_unique<EBinOp>(
 				std::move(head),
 				std::move(expr()),

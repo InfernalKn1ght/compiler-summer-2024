@@ -8,4 +8,8 @@ target_sources(
 	ast.h
 	parser.cpp
 	parser.h
+	types.h
+	types.cpp
+	utils.h
+	utils.cpp
 )
