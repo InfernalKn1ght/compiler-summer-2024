@@ -7,7 +7,9 @@ namespace AST {
 class AstBuilder {
 	private:
 		Parser p;
+
 		std::unique_ptr<Expr> EConst_head();
+		std::unique_ptr<Expr> prod();
 
 
 	public:
