@@ -20,7 +20,7 @@ class Parser {
 	public:
 		Parser(const std::string& str) : str(str), pos(0), size(str.size()) {};
 		const EConst get_const();
-		const std::string get_variable();
+		const EVariable get_variable();
 		const std::string get_keyword();
 		const BinaryOperator get_binary_operation();
 		const UnaryOperator get_unary_operation();

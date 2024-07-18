@@ -1,7 +1,9 @@
 #include "ast.h"
 #include "parser.h"
+#include "types.h"
 
 #include <cstddef>
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -11,9 +13,14 @@ namespace AST {
         std::unique_ptr<Expr> head;
         try {
             head = std::make_unique<EConst>(p.get_const());
-        } catch (std::exception &e) {
-            throw std::invalid_argument("Head is not a const");
-        }
+        } catch (std::invalid_argument) {}
+
+		try {
+			head = std::make_unique<EVariable>(p.get_variable());
+		} catch (std::invalid_argument){}
+
+		if (head.get() == nullptr)
+            throw std::logic_error("Invalid syntax");
 
         const std::size_t init_pos = p.get_pos();
 
@@ -28,13 +35,12 @@ namespace AST {
                 return std::move(new_root);
             }
 
-        } catch (std::invalid_argument &e) {
-        }
+        } catch (std::invalid_argument &e) {}
         p.set_pos(init_pos);
         return std::move(head);
     }
 
-    std::unique_ptr<Expr> AstBuilder::EConst_head() {
+    std::unique_ptr<Expr> AstBuilder::expr() {
         // try {
         //     UnaryOperator op = p.get_unary_operation();
         // 	std::unique_ptr<EUnaryOp> new_head = std::make_unique<EUnaryOp>(
@@ -44,41 +50,50 @@ namespace AST {
         // 	head = std::move(new_head);
         // } catch (std::invalid_argument &e) {}
 
-        std::unique_ptr<Expr> temp;
+        std::unique_ptr<Expr> result;
         try {
-            temp = prod();
-        } catch (std::invalid_argument &e) {
-        }
+            result = prod();
+        } catch (std::invalid_argument &e) {}
 
 		const std::size_t init_pos = p.get_pos();
         try {
-
             BinaryOperator op = p.get_binary_operation();
             std::unique_ptr<EBinOp> new_root;
 
-            if (op == PLUS) {
+            if (op == PLUS || op == MINUS) {
                 new_root = std::make_unique<EBinOp>(
-                    std::move(temp),
-                    std::move(EConst_head()),
+                    std::move(result),
+                    std::move(expr()),
                     op);
                 return std::move(new_root);
             }
-        } catch (std::invalid_argument &e) {
-        }
+        } catch (std::invalid_argument &e) {}
 		p.set_pos(init_pos);
-        return std::move(temp);
+        return std::move(result);
     }
 
-    std::unique_ptr<Expr> AstBuilder::get_root() {
+    std::unique_ptr<Expr> AstBuilder::stmt() {
         const std::size_t init_pos = p.get_pos();
 
         try {
-            return EConst_head();
-        } catch (std::invalid_argument) {
-        }
+			std::unique_ptr<EVariable> ident = std::make_unique<EVariable>(p.get_variable());
+			BinaryOperator op;
+			try {
+				op = p.get_binary_operation(); 
+			} catch (std::invalid_argument) {}
+			if (op != ASSIGMENT){
+				throw  std::logic_error("Invalid syntax");
+			}
+			std::unique_ptr<EBinOp> new_root = std::make_unique<EBinOp>(
+				std::move(ident),
+				std::move(expr()),
+				op
+			);
+			return std::move(new_root);
+        } catch (std::invalid_argument) {}
         p.set_pos(init_pos);
 
-        throw std::invalid_argument("Invalid syntax");
+        throw std::logic_error("Invalid syntax");
     }
 
 }

@@ -10,7 +10,12 @@ namespace AST {
 			std::cout << prefix << (isLeft ? "├──" : "└──" ) << char(ebinop->op) << "\n";
 			pretty_print(prefix + (isLeft ? "│   " : "    "), ebinop->left, true);
 			pretty_print(prefix + (isLeft ? "│   " : "    "), ebinop->right, false);
+		} else if (auto econ = dynamic_cast<EVariable*>(expr.get())) {
+			std::cout << prefix << (isLeft ? "├──" : "└──" ) << econ->name << "\n";
+		} else {
+			std::cout << prefix << (isLeft ? "├──" : "└──" ) << "WRONG TYPE" << std::endl;
 		}
+
 	}
 
 	void pretty_print(const std::unique_ptr<Expr>& expr) {

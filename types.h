@@ -22,11 +22,13 @@ class EVariable : public Expr {
 	public:
 		EVariable(std::string name, std::shared_ptr<EConst> value):
 			value(value), name(name) {};
+		EVariable(std::string name):
+			value(nullptr), name(name) {};
 		std::shared_ptr<EConst> value;
 		std::string name;
 };
 
-enum BinaryOperator { PLUS='+', MINUS='-', MULTIPLICATION='*' };
+enum BinaryOperator { PLUS='+', MINUS='-', MULTIPLICATION='*', ASSIGMENT='=' };
 enum UnaryOperator { Factorial='!' };
 
 class EOperator : public Expr {

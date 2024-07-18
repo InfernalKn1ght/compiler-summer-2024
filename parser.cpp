@@ -75,7 +75,7 @@ namespace AST {
         }
     };
 
-    const std::string Parser::get_variable() {
+    const EVariable Parser::get_variable() {
         try {
             std::string result = get_keyword_or_ident();
             if (is_variable(result))
@@ -94,8 +94,7 @@ namespace AST {
 
     const BinaryOperator Parser::get_binary_operation() {
         ws();
-        // TODO - А если оператор не char а string
-        char symbol = str[pos];
+		char symbol = str[pos];
         switch (symbol) {
         case '+':
         case '-':
@@ -103,8 +102,15 @@ namespace AST {
             pos++;
             return BinaryOperator(symbol);
         default:
-            throw std::invalid_argument("Char is not a operator " + str.substr(pos, 1));
+			break;
         }
+
+		if (str.substr(pos, 2) == ":=") {
+			pos+=2;
+			return ASSIGMENT;
+		};
+
+		throw std::invalid_argument("String is not a operator: " + str.substr(pos));
     }
 
     const UnaryOperator Parser::get_unary_operation() {
