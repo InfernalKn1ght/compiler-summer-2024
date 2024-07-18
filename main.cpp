@@ -1,8 +1,8 @@
 #include <iostream>
-#include "ast.h"
-#include "parser.h"
+#include "compiler.h"
 
 int main() {
-
+	AST::Compiler compiler("input.txt", "output.txt");
+	compiler.compile();
     return EXIT_SUCCESS;
 }

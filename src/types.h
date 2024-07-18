@@ -32,9 +32,7 @@ namespace AST {
                           ASSIGMENT = '=' };
     enum UnaryOperator { Factorial = '!' };
 
-    class EOperator : public Expr {
-        virtual const std::string record() const = 0; // Функция будет возвращать соответсвующий оператору ассемблерный код
-    };
+    class EOperator : public Expr {};
 
     class EBinOp : public EOperator {
     public:
@@ -42,8 +40,6 @@ namespace AST {
         std::unique_ptr<Expr> left;
         std::unique_ptr<Expr> right;
         BinaryOperator op;
-
-        const std::string record() const;
     };
 
     class EUnaryOp : public EOperator {
@@ -51,12 +47,7 @@ namespace AST {
         EUnaryOp(std::unique_ptr<Expr> expression, UnaryOperator op) : expression(std::move(expression)), op(op) {};
         std::unique_ptr<Expr> expression;
         UnaryOperator op;
-
-        const std::string record() const;
     };
 
-	void ast_gen_start();
-	void ast_gen_end();
-	void ast_gen_expr(std::unique_ptr<Expr> root);
 
 }
