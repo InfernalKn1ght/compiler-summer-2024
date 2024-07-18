@@ -72,7 +72,7 @@ namespace AST {
         return std::move(result);
     }
 
-    std::unique_ptr<Expr> AstBuilder::stmt() {
+    std::unique_ptr<EBinOp> AstBuilder::stmt() {
         const std::size_t init_pos = p.get_pos();
 
         try {
@@ -119,22 +119,24 @@ namespace AST {
                 std::unique_ptr<EBinOp> new_root = std::make_unique<EBinOp>(
                     std::move(result),
                     std::move(body_stmts),
-                    op);
+                    DO);
                 return std::move(new_root);
             }
         } catch (std::invalid_argument) {}
+		p.set_pos(init_pos);
 
         throw std::logic_error("Invalid syntax");
     }
 
     std::unique_ptr<Stmt> AstBuilder::stmts() {
+		std::unique_ptr<Stmt> stmt_list;
         try {
-            std::unique_ptr<Stmt> stmt_list = std::make_unique<Stmt>(
+            stmt_list = std::make_unique<Stmt>(
 				std::move(stmt()),
-				std::move(stmts()),
+				std::move(stmts())
 			);
         } catch (std::invalid_argument) {}
-        return nullptr;
+		return stmt_list;
     }
 
 }

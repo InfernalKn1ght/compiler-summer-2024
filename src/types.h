@@ -11,13 +11,6 @@ namespace AST {
         virtual ~Expr() = default;
     };
 
-    class Stmt {
-        public:
-        std::unique_ptr<EBinOp> tree;
-        std::unique_ptr<Stmt> next;
-        Stmt(std::unique_ptr<EBinOp> tree, std::unique_ptr<Stmt> next = nullptr) : tree(std::move(tree)), next(std::move(next)) {}
-    }
-
     class EConst : public Expr {
     public:
         EConst(int val) : val(val) {};
@@ -42,7 +35,8 @@ namespace AST {
     enum BinaryOperator { PLUS = '+',
                           MINUS = '-',
                           MULTIPLICATION = '*',
-                          ASSIGMENT = '=' };
+                          ASSIGMENT = '=',
+						  DO = ';'};
     enum UnaryOperator { Factorial = '!' };
 
     class EOperator : public Expr {};
@@ -62,5 +56,11 @@ namespace AST {
         UnaryOperator op;
     };
 
+    class Stmt: public Expr {
+        public:
+        std::unique_ptr<EBinOp> tree;
+        std::unique_ptr<Stmt> next;
+        Stmt(std::unique_ptr<EBinOp> tree, std::unique_ptr<Stmt> next = nullptr) : tree(std::move(tree)), next(std::move(next)) {}
+    };
 
 }
