@@ -3,21 +3,18 @@
 #include <iostream>
 
 namespace AST {
-	/**
-	 * @brief ВАЖНО - вызов функции полностью стирает дерево
-	 *	
-	 * @param expr Корень AST дерева
-	 */
-	void pretty_print(std::unique_ptr<Expr> expr){
-	if (AST::EConst* econ = dynamic_cast<AST::EConst*>(expr.get())){
-		std::cout << econ->val;
-	} else if (AST::EBinOp* ebinop = dynamic_cast<AST::EBinOp*>(expr.get())){
-		pretty_print(std::move(ebinop->left));
-		std::cout << ' ' << char(ebinop->op) << ' ';
-		pretty_print(std::move(ebinop->right));
-	} else if (AST::EUnaryOp* eunop = dynamic_cast<AST::EUnaryOp*>(expr.get())){
-		pretty_print(std::move(eunop->expression));
-		std::cout << char(eunop->op);
+	void pretty_print(const std::string& prefix, const std::unique_ptr<Expr>& expr, bool isLeft) {
+		if (auto econ = dynamic_cast<EConst*>(expr.get())) {
+			std::cout << prefix << (isLeft ? "├──" : "└──" ) << econ->val << "\n";
+		} else if (auto ebinop = dynamic_cast<EBinOp*>(expr.get())) {
+			std::cout << prefix << (isLeft ? "├──" : "└──" ) << char(ebinop->op) << "\n";
+			pretty_print(prefix + (isLeft ? "│   " : "    "), ebinop->left, true);
+			pretty_print(prefix + (isLeft ? "│   " : "    "), ebinop->right, false);
+		}
 	}
-	};
+
+	void pretty_print(const std::unique_ptr<Expr>& expr) {
+		pretty_print("", expr, false);
+	}
+
 }

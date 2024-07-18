@@ -2,5 +2,5 @@
 #include "types.h"
 
 namespace AST {
-	void pretty_print(std::unique_ptr<Expr>);
+	void pretty_print(const std::unique_ptr<Expr>&);
 }
