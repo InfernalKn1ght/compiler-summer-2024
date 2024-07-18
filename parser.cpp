@@ -103,7 +103,7 @@ namespace AST {
             pos++;
             return BinaryOperator(symbol);
         default:
-            throw std::invalid_argument("Char is not a operator" + str.substr(pos, 1));
+            throw std::invalid_argument("Char is not a operator " + str.substr(pos, 1));
         }
     }
 
@@ -116,7 +116,7 @@ namespace AST {
             pos++;
             return UnaryOperator(symbol);
         default:
-            throw std::invalid_argument("Char is not a operator" + str.substr(pos, 1));
+            throw std::invalid_argument("Char is not a operator " + str.substr(pos, 1));
         }
     }
 

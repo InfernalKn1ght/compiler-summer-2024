@@ -50,8 +50,8 @@ namespace AST {
         } catch (std::invalid_argument &e) {
         }
 
+		const std::size_t init_pos = p.get_pos();
         try {
-            const std::size_t init_pos = p.get_pos();
 
             BinaryOperator op = p.get_binary_operation();
             std::unique_ptr<EBinOp> new_root;
@@ -65,6 +65,7 @@ namespace AST {
             }
         } catch (std::invalid_argument &e) {
         }
+		p.set_pos(init_pos);
         return std::move(temp);
     }
 
