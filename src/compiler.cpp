@@ -10,7 +10,7 @@ namespace AST {
 
     void Compiler::ast_gen_end() { // Temporary function. Later replace with converting integer to string
         writer.writeLine("	li a7, 93");
-        writer.writeLine("	");
+        writer.writeLine("	ecall");
     }
 
     void Compiler::ast_gen_expr(std::unique_ptr<Expr> root) {

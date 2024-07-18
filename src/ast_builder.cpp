@@ -93,7 +93,48 @@ namespace AST {
         } catch (std::invalid_argument) {}
         p.set_pos(init_pos);
 
+        try {
+            std::unique_ptr<EKeyWord> key_word = std::make_unique<EKeyWord>(p.get_keyword());
+            if (key_word->word == "while") {
+                std::unique_ptr<Expr> result = expr();
+                std::unique_ptr<EKeyWord> key_word_do;
+
+                try {
+                    std::unique_ptr<EKeyWord> key_word_do = std::make_unique<EKeyWord>(p.get_keyword());
+                } catch (std::invalid_argument) {
+                }
+                if (key_word_do->word != "do") {
+                    throw std::logic_error("Invalid syntax");
+                }
+                std::unique_ptr<Stmt> body_stmts = stmts();
+
+                try {
+                    std::unique_ptr<EKeyWord> key_word_done = std::make_unique<EKeyWord>(p.get_keyword());
+                } catch (std::invalid_argument) {
+                }
+                if (key_word_do->word != "done") {
+                    throw std::logic_error("Invalid syntax");
+                }
+
+                std::unique_ptr<EBinOp> new_root = std::make_unique<EBinOp>(
+                    std::move(result),
+                    std::move(body_stmts),
+                    op);
+                return std::move(new_root);
+            }
+        } catch (std::invalid_argument) {}
+
         throw std::logic_error("Invalid syntax");
+    }
+
+    std::unique_ptr<Stmt> AstBuilder::stmts() {
+        try {
+            std::unique_ptr<Stmt> stmt_list = std::make_unique<Stmt>(
+				std::move(stmt()),
+				std::move(stmts()),
+			);
+        } catch (std::invalid_argument) {}
+        return nullptr;
     }
 
 }

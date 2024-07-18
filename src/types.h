@@ -11,6 +11,13 @@ namespace AST {
         virtual ~Expr() = default;
     };
 
+    class Stmt {
+        public:
+        std::unique_ptr<EBinOp> tree;
+        std::unique_ptr<Stmt> next;
+        Stmt(std::unique_ptr<EBinOp> tree, std::unique_ptr<Stmt> next = nullptr) : tree(std::move(tree)), next(std::move(next)) {}
+    }
+
     class EConst : public Expr {
     public:
         EConst(int val) : val(val) {};
@@ -24,6 +31,12 @@ namespace AST {
         EVariable(std::string name) : value(nullptr), name(name) {};
         std::shared_ptr<EConst> value;
         std::string name;
+    };
+
+    class EKeyWord : public Expr {
+        public:
+        std::string word;
+        EKeyWord(std::string word) : word(word) {}
     };
 
     enum BinaryOperator { PLUS = '+',
