@@ -6,54 +6,57 @@
 
 namespace AST {
 
-class Expr {
-public:
-	virtual ~Expr() = default;
-};
+    class Expr {
+    public:
+        virtual ~Expr() = default;
+    };
 
-class EConst : public Expr {
-	public:
-		EConst(int val) : val(val) {};
-		EConst(const std::string& str) : val(std::stoi(str)) {};
-		int val;
-};
+    class EConst : public Expr {
+    public:
+        EConst(int val) : val(val) {};
+        EConst(const std::string &str) : val(std::stoi(str)) {};
+        int val;
+    };
 
-class EVariable : public Expr {
-	public:
-		EVariable(std::string name, std::shared_ptr<EConst> value):
-			value(value), name(name) {};
-		EVariable(std::string name):
-			value(nullptr), name(name) {};
-		std::shared_ptr<EConst> value;
-		std::string name;
-};
+    class EVariable : public Expr {
+    public:
+        EVariable(std::string name, std::shared_ptr<EConst> value) : value(value), name(name) {};
+        EVariable(std::string name) : value(nullptr), name(name) {};
+        std::shared_ptr<EConst> value;
+        std::string name;
+    };
 
-enum BinaryOperator { PLUS='+', MINUS='-', MULTIPLICATION='*', ASSIGMENT='=' };
-enum UnaryOperator { Factorial='!' };
+    enum BinaryOperator { PLUS = '+',
+                          MINUS = '-',
+                          MULTIPLICATION = '*',
+                          ASSIGMENT = '=' };
+    enum UnaryOperator { Factorial = '!' };
 
-class EOperator : public Expr {
-	virtual const std::string record() const = 0; // Функция будет возвращать соответсвующий оператору ассемблерный код
-};
+    class EOperator : public Expr {
+        virtual const std::string record() const = 0; // Функция будет возвращать соответсвующий оператору ассемблерный код
+    };
 
-class EBinOp : public EOperator {
-	public:
-		EBinOp(std::unique_ptr<Expr> left, std::unique_ptr<Expr> right, BinaryOperator op) :
-			left(std::move(left)), right(std::move(right)), op(op) {};
-		std::unique_ptr<Expr> left;
-		std::unique_ptr<Expr> right;
-		BinaryOperator op;
+    class EBinOp : public EOperator {
+    public:
+        EBinOp(std::unique_ptr<Expr> left, std::unique_ptr<Expr> right, BinaryOperator op) : left(std::move(left)), right(std::move(right)), op(op) {};
+        std::unique_ptr<Expr> left;
+        std::unique_ptr<Expr> right;
+        BinaryOperator op;
 
-		const std::string record() const;
-};
+        const std::string record() const;
+    };
 
-class EUnaryOp : public EOperator {
-	public:
-		EUnaryOp(std::unique_ptr<Expr> expression, UnaryOperator op) :
-			expression(std::move(expression)), op(op) {};
-		std::unique_ptr<Expr> expression;
-		UnaryOperator op;
+    class EUnaryOp : public EOperator {
+    public:
+        EUnaryOp(std::unique_ptr<Expr> expression, UnaryOperator op) : expression(std::move(expression)), op(op) {};
+        std::unique_ptr<Expr> expression;
+        UnaryOperator op;
 
-		const std::string record() const;
-};
+        const std::string record() const;
+    };
+
+	void ast_gen_start();
+	void ast_gen_end();
+	void ast_gen_expr(std::unique_ptr<Expr> root);
 
 }
