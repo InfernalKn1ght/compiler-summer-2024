@@ -109,7 +109,7 @@ namespace AST {
                 std::unique_ptr<Stmt> body_stmts = stmts();
 
                 try {
-                    std::unique_ptr<EKeyWord> key_word_done = std::make_unique<EKeyWord>(p.get_keyword());
+                    key_word_do = std::make_unique<EKeyWord>(p.get_keyword());
                 } catch (std::invalid_argument) {
                 }
                 if (key_word_do->word != "done") {
