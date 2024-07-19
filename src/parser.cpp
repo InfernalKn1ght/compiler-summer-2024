@@ -99,6 +99,8 @@ namespace AST {
         case '+':
         case '-':
         case '*':
+        case '(':
+        case ')':
             pos++;
             return BinaryOperator(symbol);
         default:
