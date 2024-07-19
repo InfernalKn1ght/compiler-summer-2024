@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <string>
 #include <memory>
+#include <set>
 
 namespace AST {
 class Parser {
@@ -16,6 +17,7 @@ class Parser {
 		bool is_variable(std::string);
 		bool is_whitespace(char);
 		void ws();
+		static const std::set<std::string> keywords;
 
 	public:
 		Parser(const std::string& str) : str(str), pos(0), size(str.size()) {};

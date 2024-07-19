@@ -69,11 +69,7 @@ namespace AST {
         // 	head = std::move(new_head);
         // } catch (std::invalid_argument &e) {}
 
-        std::unique_ptr<Expr> result;
-        try {
-            result = prod();
-        } catch (std::invalid_argument &e) {
-        }
+        std::unique_ptr<Expr> result = prod();
 
         const std::size_t init_pos = p.get_pos();
         try {
@@ -104,7 +100,7 @@ namespace AST {
             } catch (std::invalid_argument) {
             }
             if (op != ASSIGMENT) {
-                throw std::logic_error("Invalid syntax");
+                throw std::logic_error("Invalid syntax: missing assigment");
             }
             std::unique_ptr<EBinOp> new_root = std::make_unique<EBinOp>(
                 std::move(ident),
@@ -126,7 +122,7 @@ namespace AST {
                 } catch (std::invalid_argument) {
                 }
                 if (internal_key_word != "do") {
-                    throw std::logic_error("Invalid syntax");
+                    throw std::logic_error("Invalid syntax: missing do keyword");
                 }
                 std::unique_ptr<Stmt> while_body_stmts = stmts();
 
@@ -135,7 +131,7 @@ namespace AST {
                 } catch (std::invalid_argument) {
                 }
                 if (internal_key_word != "done") {
-                    throw std::logic_error("Invalid syntax");
+                    throw std::logic_error("Invalid syntax: missing done keyword");
                 }
 
                 std::unique_ptr<EBinOp> new_root = std::make_unique<EBinOp>(
@@ -152,7 +148,7 @@ namespace AST {
                 } catch (std::invalid_argument) {
                 }
                 if (internal_key_word != "then") {
-                    throw std::logic_error("Invalid syntax");
+                    throw std::logic_error("Invalid syntax: missing then keyword");
                 }
 
                 std::unique_ptr<Stmt> if_body_stmts = stmts();
@@ -173,7 +169,7 @@ namespace AST {
                 }
 
                 if (internal_key_word != "fi") {
-                    throw std::logic_error("Invalid syntax");
+                    throw std::logic_error("Invalid syntax: missing fi keyword");
                 }
 
                 std::unique_ptr<EBinOp> new_root = std::make_unique<EBinOp>(
@@ -186,7 +182,7 @@ namespace AST {
         }
         p.set_pos(init_pos);
 
-        throw std::logic_error("Invalid syntax");
+        throw std::logic_error("Invalid syntax: missing statement");
     }
 
     std::unique_ptr<Stmt> AstBuilder::stmts() {

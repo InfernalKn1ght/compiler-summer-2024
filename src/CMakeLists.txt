@@ -9,8 +9,7 @@ target_sources(
 	parser.cpp
 	parser.h
 	types.h
-	utils.h
-	utils.cpp
+	types.cpp
 )
 
 target_include_directories(compiler PUBLIC

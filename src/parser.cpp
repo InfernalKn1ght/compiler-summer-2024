@@ -25,8 +25,19 @@ namespace AST {
         }
     };
 
+	const std::set<std::string> Parser::keywords{
+		"if",
+		"then",
+		"else",
+		"fi",
+		"while",
+		"do",
+		"done"
+	};
+	
+
     bool Parser::is_keyword(std::string str) {
-        return false;
+		return (keywords.count(str) > 0);
     };
 
     bool Parser::is_variable(std::string str) {
@@ -65,23 +76,29 @@ namespace AST {
     };
 
     const std::string Parser::get_keyword() {
+		auto init_pos = pos;
         try {
             std::string result = get_keyword_or_ident();
             if (is_keyword(result))
                 return result;
+			pos = init_pos;
             throw std::invalid_argument("String is not a keyword: " + str.substr(pos));
         } catch (std::invalid_argument) {
+			pos = init_pos;
             throw std::invalid_argument("String is not a keyword: " + str.substr(pos));
         }
     };
 
     const EVariable Parser::get_variable() {
+		auto init_pos = pos;
         try {
             std::string result = get_keyword_or_ident();
             if (is_variable(result))
                 return result;
+			pos = init_pos;
             throw std::invalid_argument("String is not a variable: " + str.substr(pos));
         } catch (std::invalid_argument) {
+			pos = init_pos;
             throw std::invalid_argument("String is not a variable: " + str.substr(pos));
         }
     };
