@@ -1,3 +1,6 @@
 build/
 input.txt
-output.txt
+output*
+Debug/
+.cache/
+compile_commands.json
