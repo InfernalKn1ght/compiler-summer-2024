@@ -30,6 +30,8 @@ namespace AST {
                           MINUS = '-',
                           MULTIPLICATION = '*',
                           ASSIGMENT = '=',
+                          LEFT_BRACKET = '(',
+                          RIGHT_BRACKET = ')',
 						  WHILE,
                           IF,
                           ELSE };

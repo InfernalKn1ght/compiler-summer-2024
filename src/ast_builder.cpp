@@ -10,6 +10,22 @@
 
 namespace AST {
     std::unique_ptr<Expr> AstBuilder::prod() {
+        const std::size_t init_pos1 = p.get_pos();
+        try {
+            BinaryOperator op = p.get_binary_operation();
+
+            if (op == LEFT_BRACKET) {
+                std::unique_ptr<Expr> temp = expr();
+                op = p.get_binary_operation();
+                if (op != RIGHT_BRACKET) {
+                    throw std::logic_error("Invalid syntax");
+                }
+                return temp;
+            }
+        } catch (std::invalid_argument &e) {
+        }
+        p.set_pos(init_pos1);
+
         std::unique_ptr<Expr> head;
         try {
             head = std::make_unique<EConst>(p.get_const());
