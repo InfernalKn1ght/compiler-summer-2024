@@ -186,14 +186,22 @@ namespace AST {
     }
 
     std::unique_ptr<Stmt> AstBuilder::stmts() {
-        std::unique_ptr<Stmt> stmt_list;
+		std::unique_ptr<EBinOp> tree;
+		std::unique_ptr<Stmt> next;
+		try{
+			tree = stmt();
+			next = stmts();
+		} catch (std::logic_error){
+			return nullptr;
+		}
         try {
-            stmt_list = std::make_unique<Stmt>(
-                std::move(stmt()),
-                std::move(stmts()));
+            return std::make_unique<Stmt>(
+                std::move(tree),
+                std::move(next)
+			);
         } catch (std::invalid_argument) {
         }
-        return stmt_list;
+        return nullptr;
     }
 
 }

@@ -1,4 +1,5 @@
 #include "compiler.h"
+#include <memory>
 #include <string>
 #include "ast_builder.h"
 
@@ -40,12 +41,13 @@ namespace AST {
     }
 
 	void Compiler::compile(){
-		ast_gen_start();
+		/* ast_gen_start(); */
 		while (reader.readLine(current_line)) {
 			AstBuilder builder = current_line;
-			auto command = builder.expr();
-			ast_gen_expr(std::move(command));
+			auto command = builder.stmts();
+			command->print();
+			/* ast_gen_expr(std::move(command)); */
 		}
-		ast_gen_end();
+		/* ast_gen_end(); */
 	}
 }
