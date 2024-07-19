@@ -26,17 +26,13 @@ namespace AST {
         std::string name;
     };
 
-    class EKeyWord : public Expr {
-        public:
-        std::string word;
-        EKeyWord(std::string word) : word(word) {}
-    };
-
     enum BinaryOperator { PLUS = '+',
                           MINUS = '-',
                           MULTIPLICATION = '*',
                           ASSIGMENT = '=',
-						  DO = ';'};
+						  WHILE,
+                          IF,
+                          ELSE };
     enum UnaryOperator { Factorial = '!' };
 
     class EOperator : public Expr {};
