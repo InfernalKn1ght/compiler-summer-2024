@@ -81,12 +81,9 @@ namespace AST {
             std::string result = get_keyword_or_ident();
             if (is_keyword(result))
                 return result;
-			pos = init_pos;
-            throw std::invalid_argument("String is not a keyword: " + str.substr(pos));
-        } catch (std::invalid_argument) {
-			pos = init_pos;
-            throw std::invalid_argument("String is not a keyword: " + str.substr(pos));
-        }
+        } catch (std::invalid_argument) {}
+		pos = init_pos;
+		throw std::invalid_argument("String is not a keyword: " + str.substr(pos));
     };
 
     const EVariable Parser::get_variable() {
@@ -95,12 +92,9 @@ namespace AST {
             std::string result = get_keyword_or_ident();
             if (is_variable(result))
                 return result;
-			pos = init_pos;
-            throw std::invalid_argument("String is not a variable: " + str.substr(pos));
-        } catch (std::invalid_argument) {
-			pos = init_pos;
-            throw std::invalid_argument("String is not a variable: " + str.substr(pos));
-        }
+        } catch (std::invalid_argument) {}
+		pos = init_pos;
+		throw std::invalid_argument("String is not a variable: " + str.substr(pos));
     };
 
     void Parser::ws() {
@@ -109,28 +103,32 @@ namespace AST {
         }
     }
 
-    const BinaryOperator Parser::get_binary_operation() {
-        ws();
+	const BinaryOperator Parser::get_binary_operation() {
+		ws();
 		char symbol = str[pos];
-        switch (symbol) {
-        case '+':
-        case '-':
-        case '*':
-        case '(':
-        case ')':
-            pos++;
-            return BinaryOperator(symbol);
-        default:
-			break;
-        }
+		switch (symbol) {
+			case '+':
+			case '-':
+			case '*':
+			case '(':
+			case ')':
+				pos++;
+				return BinaryOperator(symbol);
+			default:
+				break;
+		}
 
 		if (str.substr(pos, 2) == ":=") {
-			pos+=2;
+			pos += 2;
 			return ASSIGMENT;
-		};
+		}
+
+		if (symbol == '\0') {
+			throw std::invalid_argument("End of string reached");
+		}
 
 		throw std::invalid_argument("String is not a operator: " + str.substr(pos));
-    }
+	}
 
     const UnaryOperator Parser::get_unary_operation() {
         ws();

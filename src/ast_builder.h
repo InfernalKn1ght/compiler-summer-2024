@@ -13,8 +13,8 @@ class AstBuilder {
 
 	public:
 		AstBuilder(std::string str): p(str) {};
-		std::unique_ptr<Stmt> stmts();
-		std::unique_ptr<EBinOp> stmt();
+		std::unique_ptr<Stmts> stmts();
+		std::unique_ptr<Stmt> stmt();
 		std::unique_ptr<Expr> expr();
 
 };
