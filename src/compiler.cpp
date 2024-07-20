@@ -4,9 +4,9 @@
 #include "ast_builder.h"
 
 namespace AST {
-    void Compiler::ast_gen_start() {
+	void Compiler::ast_gen_start() {
 		writer.writeLine(".global _start");
-        writer.writeLine("_start:");
+		writer.writeLine("_start:");
     }
 
     void Compiler::ast_gen_end() { // Temporary function. Later replace with converting integer to string
@@ -41,13 +41,10 @@ namespace AST {
     }
 
 	void Compiler::compile(){
-		/* ast_gen_start(); */
 		while (reader.readLine(current_line)) {
-			AstBuilder builder = current_line;
+			AstBuilder builder(current_line);
 			auto command = builder.stmts();
 			command->print();
-			/* ast_gen_expr(std::move(command)); */
 		}
-		/* ast_gen_end(); */
 	}
 }

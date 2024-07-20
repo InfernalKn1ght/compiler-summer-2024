@@ -27,7 +27,9 @@ class Parser {
 		const BinaryOperator get_binary_operation();
 		const UnaryOperator get_unary_operation();
 
-		void print() const {std::cout << str << ' ' << pos << ' ' << str.substr(pos) << std::endl;};
+		void print() const {std::cout << str << " <-- str; " << pos << " <-- pos; " << str.substr(pos) << " <-- substring;\n\n";};
 		bool eof() const {return pos>=size;};
+		std::size_t get_pos(){return pos;};
+		void set_pos(std::size_t new_pos){pos=new_pos;};
 };
 }

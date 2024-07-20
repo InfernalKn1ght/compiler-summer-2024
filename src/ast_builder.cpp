@@ -10,19 +10,19 @@
 
 namespace AST {
 std::unique_ptr<Expr> AstBuilder::prod() {
-	try {
-		BinaryOperator op = p.get_binary_operation();
+	/* try { */
+	/* 	BinaryOperator op = p.get_binary_operation(); */
 
-		if (op == LEFT_BRACKET) {
-			std::unique_ptr<Expr> temp = expr();
-			op = p.get_binary_operation();
-			if (op != RIGHT_BRACKET) {
-				throw std::logic_error("Invalid syntax");
-			}
-			return temp;
-		}
-	} catch (std::invalid_argument &e) {
-	}
+	/* 	if (op == LEFT_BRACKET) { */
+	/* 		std::unique_ptr<Expr> temp = expr(); */
+	/* 		op = p.get_binary_operation(); */
+	/* 		if (op != RIGHT_BRACKET) { */
+	/* 			throw std::logic_error("Invalid syntax"); */
+	/* 		} */
+	/* 		return temp; */
+	/* 	} */
+	/* } catch (std::invalid_argument &e) { */
+	/* } */
 
 	std::unique_ptr<Expr> head;
 	try {
@@ -39,11 +39,6 @@ std::unique_ptr<Expr> AstBuilder::prod() {
 
 	try {
 		head = std::make_unique<EConst>(p.get_const());
-	} catch (std::invalid_argument) {
-	}
-
-	try {
-		head = std::make_unique<EVariable>(p.get_variable());
 	} catch (std::invalid_argument) {
 	}
 
@@ -88,8 +83,6 @@ std::unique_ptr<Expr> AstBuilder::expr() {
 
 
 std::unique_ptr<Stmt> AstBuilder::stmt() {
-	std::cout << "Parsing statement\n";
-	p.print();
     try {
         std::unique_ptr<EVariable> ident = std::make_unique<EVariable>(p.get_variable());
         BinaryOperator op;
@@ -165,7 +158,6 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
             if (internal_key_word != "fi") {
                 throw std::logic_error("Invalid syntax: missing fi keyword");
             }
-
             std::unique_ptr<EIf> new_root = std::make_unique<EIf>(
                 std::move(result),
                 std::move(if_body_stmts),
@@ -181,13 +173,14 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
 std::unique_ptr<Stmts> AstBuilder::stmts() {
     std::unique_ptr<Stmts> stmts = std::make_unique<Stmts>();
     while (true) {
+		std::size_t init_pos = p.get_pos();
         try {
             std::unique_ptr<Stmt> current_stmt = stmt();
             stmts->add_stmt(std::move(current_stmt));
         } catch (std::logic_error) {
-            continue;
+			p.set_pos(init_pos);
+            break;
         }
-		if (p.eof()){break;}
     }
     return stmts;
 }
