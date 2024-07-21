@@ -35,9 +35,13 @@ namespace AST {
     enum BinaryOperator { PLUS = '+',
                           MINUS = '-',
                           MULTIPLICATION = '*',
-                          ASSIGMENT = '=',
-                          LEFT_BRACKET = '(',
-                          RIGHT_BRACKET = ')'};
+                          ASSIGMENT = '='
+	};
+
+	enum Bracket {
+					LEFT_BRACKET = '(',
+					RIGHT_BRACKET = ')'
+	};
     enum UnaryOperator { Factorial = '!' };
 
     class EOperator : public Expr {};

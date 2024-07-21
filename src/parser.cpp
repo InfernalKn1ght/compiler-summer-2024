@@ -123,16 +123,11 @@ namespace AST {
 			return ASSIGMENT;
 		}
 
-		if (symbol == '\0') {
-			throw std::invalid_argument("End of string reached");
-		}
-
 		throw std::invalid_argument("String is not a operator: " + str.substr(pos));
 	}
 
     const UnaryOperator Parser::get_unary_operation() {
         ws();
-        // TODO - А если оператор не char а string
         char symbol = str[pos];
         switch (symbol) {
         case '!':
@@ -140,6 +135,19 @@ namespace AST {
             return UnaryOperator(symbol);
         default:
             throw std::invalid_argument("Char is not a operator " + str.substr(pos, 1));
+        }
+    }
+
+    const Bracket Parser::get_bracket() {
+        ws();
+        char symbol = str[pos];
+        switch (symbol) {
+        case '(':
+		case ')':
+            pos++;
+            return Bracket(symbol);
+        default:
+            throw std::invalid_argument("Char is not a bracket " + str.substr(pos, 1));
         }
     }
 

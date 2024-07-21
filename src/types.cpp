@@ -33,9 +33,9 @@ namespace AST {
     }
 
     void EUnaryOp::print(const std::string& prefix, bool isLeft) const {
-        std::cout << prefix << (isLeft ? "├──" : "└──") << "!"
+        std::cout << prefix << (isLeft ? "├── " : "└── ") << char(op)
                   << "\n";
-        expression->print(prefix + (isLeft ? "│   " : "    "), true);
+        expression->print(prefix + (isLeft ? "│   " : "    "), false);
     }
 
     void EAssign::print(const std::string& prefix, bool isLeft) const {

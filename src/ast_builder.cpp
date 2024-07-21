@@ -9,55 +9,68 @@
 #include <string>
 
 namespace AST {
+std::unique_ptr<Expr> AstBuilder::brackets(){
+	auto before_brackets_pos = p.get_pos();
+	try {
+		Bracket op = p.get_bracket();
+
+		if (op == LEFT_BRACKET) {
+			std::unique_ptr<Expr> head = expr();
+			op = p.get_bracket();
+			if (op != RIGHT_BRACKET) {
+				throw std::logic_error("Invalid syntax: missing right bracket");
+			}
+			return std::move(head);
+		}
+
+	} catch (std::invalid_argument &e) {
+	}
+	p.set_pos(before_brackets_pos);
+	throw std::invalid_argument("Missing brackets");
+}
+
 std::unique_ptr<Expr> AstBuilder::prod() {
-	/* try { */
-	/* 	BinaryOperator op = p.get_binary_operation(); */
-
-	/* 	if (op == LEFT_BRACKET) { */
-	/* 		std::unique_ptr<Expr> temp = expr(); */
-	/* 		op = p.get_binary_operation(); */
-	/* 		if (op != RIGHT_BRACKET) { */
-	/* 			throw std::logic_error("Invalid syntax"); */
-	/* 		} */
-	/* 		return temp; */
-	/* 	} */
-	/* } catch (std::invalid_argument &e) { */
-	/* } */
-
 	std::unique_ptr<Expr> head;
+
+	try {
+		head = std::make_unique<EConst>(p.get_const());
+	} catch (std::invalid_argument) {
+		try{
+			head = std::make_unique<EVariable>(p.get_variable());
+		} catch (std::invalid_argument) {
+			head = brackets();
+		}
+	}
+
+	if (!head)
+		throw std::logic_error("Invalid syntax: missing head of expression");
+
 	try {
 		UnaryOperator op = p.get_unary_operation();
 		if (op != Factorial) {
 			throw std::invalid_argument("Invalid unary operator");
 		}
 		head = std::make_unique<EUnaryOp>(
-			std::move(prod()),
+			std::move(head),
 			op
 		);
 	} catch (std::invalid_argument) {
 	}
 
-	try {
-		head = std::make_unique<EConst>(p.get_const());
-	} catch (std::invalid_argument) {
-	}
-
-	if (!head)
-		throw std::logic_error("Invalid syntax");
-
-
+	auto after_head_pos = p.get_pos();
 	try {
 		BinaryOperator op = p.get_binary_operation();
 
 		if (op == MULTIPLICATION) {
-			std::unique_ptr<EBinOp> new_root = std::make_unique<EBinOp>(
+			head = std::make_unique<EBinOp>(
 				std::move(head),
 				std::move(prod()),
 				op);
-			return std::move(new_root);
+		}else{
+			p.set_pos(after_head_pos);
 		}
-
 	} catch (std::invalid_argument &e) {
+		p.set_pos(after_head_pos);
 	}
 	return std::move(head);
 }
@@ -65,6 +78,7 @@ std::unique_ptr<Expr> AstBuilder::prod() {
 std::unique_ptr<Expr> AstBuilder::expr() {
 	std::unique_ptr<Expr> left = prod();
 
+	auto after_left_pos = p.get_pos();
 	try {
 		BinaryOperator op = p.get_binary_operation();
 		std::unique_ptr<EBinOp> new_root;
@@ -78,11 +92,13 @@ std::unique_ptr<Expr> AstBuilder::expr() {
 		}
 	} catch (std::invalid_argument &e) {
 	}
+	p.set_pos(after_left_pos);
 	return std::move(left);
 }
 
-
 std::unique_ptr<Stmt> AstBuilder::stmt() {
+	auto init_pos = p.get_pos();
+
     try {
         std::unique_ptr<EVariable> ident = std::make_unique<EVariable>(p.get_variable());
         BinaryOperator op;
@@ -100,27 +116,24 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
         return std::move(new_root);
     } catch (std::invalid_argument) {
     }
+	p.set_pos(init_pos);
 
     try {
         std::string external_key_word = p.get_keyword();
         if (external_key_word == "while") {
             std::unique_ptr<Expr> result = expr();
-            std::string internal_key_word;
 
-            try {
-                internal_key_word = p.get_keyword();
-            } catch (std::invalid_argument) {
-            }
+			std::string internal_key_word = p.get_keyword();
             if (internal_key_word != "do") {
                 throw std::logic_error("Invalid syntax: missing do keyword");
             }
-            std::unique_ptr<Stmt> while_body_stmts = stmts();
+			std::unique_ptr<Stmts> while_body_stmts;
+			try{
+				while_body_stmts = stmts();
+			} catch (std::invalid_argument){}
 
-            try {
-                internal_key_word = p.get_keyword();
-            } catch (std::invalid_argument) {
-            }
-            if (internal_key_word != "done") {
+			std::string external_key_word = p.get_keyword();
+            if (external_key_word != "done") {
                 throw std::logic_error("Invalid syntax: missing done keyword");
             }
 
@@ -130,32 +143,27 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
             return std::move(new_root);
         } else if (external_key_word == "if") {
             std::unique_ptr<Expr> result = expr();
-            std::string internal_key_word;
 
-            try {
-                internal_key_word = p.get_keyword();
-            } catch (std::invalid_argument) {
-            }
+            std::string internal_key_word = p.get_keyword();
             if (internal_key_word != "then") {
                 throw std::logic_error("Invalid syntax: missing then keyword");
             }
-
-            std::unique_ptr<Stmt> if_body_stmts = stmts();
+			
+            std::unique_ptr<Stmts> if_body_stmts;
+			try {
+				if_body_stmts = stmts();
+			} catch (std::invalid_argument) {
+			}
             std::unique_ptr<Stmt> else_body_stmts;
 
-            try {
-                internal_key_word = p.get_keyword();
-            } catch (std::invalid_argument) {
-            }
-            if (internal_key_word == "else") {
+			std::string external_key_word = p.get_keyword();
+            if (external_key_word == "else") {
                 else_body_stmts = stmts();
+				external_key_word = p.get_keyword();
+				std::cout << external_key_word;
             }
 
-            try {
-                internal_key_word = p.get_keyword();
-            } catch (std::invalid_argument) {
-            }
-            if (internal_key_word != "fi") {
+            if (external_key_word != "fi") {
                 throw std::logic_error("Invalid syntax: missing fi keyword");
             }
             std::unique_ptr<EIf> new_root = std::make_unique<EIf>(
@@ -166,18 +174,18 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
         }
     } catch (std::invalid_argument) {
     }
-
-    throw std::logic_error("Invalid syntax");
+	p.set_pos(init_pos);
+    throw std::invalid_argument("Invalid syntax: missing statement");
 }
 
 std::unique_ptr<Stmts> AstBuilder::stmts() {
     std::unique_ptr<Stmts> stmts = std::make_unique<Stmts>();
-    while (true) {
+    while (!p.eof()) {
 		std::size_t init_pos = p.get_pos();
         try {
             std::unique_ptr<Stmt> current_stmt = stmt();
             stmts->add_stmt(std::move(current_stmt));
-        } catch (std::logic_error) {
+        } catch (std::invalid_argument) {
 			p.set_pos(init_pos);
             break;
         }

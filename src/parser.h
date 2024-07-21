@@ -26,10 +26,11 @@ class Parser {
 		const std::string get_keyword();
 		const BinaryOperator get_binary_operation();
 		const UnaryOperator get_unary_operation();
+		const Bracket get_bracket();
 
 		void print() const {std::cout << str << " <-- str; " << pos << " <-- pos; " << str.substr(pos) << " <-- substring;\n\n";};
-		bool eof() const {return pos>=size;};
-		std::size_t get_pos(){return pos;};
-		void set_pos(std::size_t new_pos){pos=new_pos;};
+		bool eof() { ws(); return pos==size; };
+		std::size_t get_pos() const { return pos; };
+		void set_pos(std::size_t new_pos){ pos=new_pos; };
 };
 }
