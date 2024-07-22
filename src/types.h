@@ -12,6 +12,7 @@ namespace AST {
     public:
         virtual ~Expr() = default;
         virtual void print(const std::string& prefix, bool isLeft) const = 0;
+		virtual std::string compile() const = 0;
     };
 
     class EConst : public Expr {
@@ -20,16 +21,18 @@ namespace AST {
         EConst(const std::string &str) : val(std::stoi(str)) {};
         int val;
         void print(const std::string& prefix="", bool isLeft=false) const override;
+		std::string compile() const override; 
     };
 
     class EVariable : public Expr {
     public:
-        EVariable(std::string name, std::shared_ptr<EConst> value) :
-            value(value), name(name) {};
-        EVariable(std::string name) : value(nullptr), name(name) {};
+        EVariable(std::string register_name, std::shared_ptr<EConst> value) :
+            value(value), register_name(register_name) {};
+        EVariable(std::string name) : value(nullptr), register_name(name) {};
         std::shared_ptr<EConst> value;
-        std::string name;
+        std::string register_name;
         void print(const std::string& prefix="", bool isLeft=false) const override;
+		std::string compile() const override; 
     };
 
     enum BinaryOperator { PLUS = '+',
@@ -54,6 +57,7 @@ namespace AST {
         std::unique_ptr<Expr> right;
         BinaryOperator op;
         void print(const std::string& prefix="", bool isLeft=false) const override;
+		std::string compile() const override;
     };
 
     class EUnaryOp : public EOperator {
@@ -63,12 +67,14 @@ namespace AST {
         std::unique_ptr<Expr> expression;
         UnaryOperator op;
         void print(const std::string& prefix="", bool isLeft=false) const override;
+		std::string compile() const override;
     };
 
     class Stmt {
     public:
         virtual ~Stmt() = default;
         virtual void print(const std::string& prefix="", bool isLeft=false) const = 0;
+		virtual std::string compile() const = 0;
     };
 
     class EAssign : public Stmt {
@@ -78,6 +84,7 @@ namespace AST {
         std::unique_ptr<EVariable> variable;
         std::unique_ptr<Expr> expr;
         void print(const std::string& prefix="", bool isLeft=false) const override;
+		std::string compile() const override;
     };
 
     class EWhile : public Stmt {
@@ -87,6 +94,7 @@ namespace AST {
         std::unique_ptr<Expr> condition;
         std::unique_ptr<Stmt> body;
         void print(const std::string& prefix="", bool isLeft=false) const override;
+		std::string compile() const override;
     };
 
     class EIf : public Stmt {
@@ -97,6 +105,7 @@ namespace AST {
         std::unique_ptr<Stmt> then_body;
         std::unique_ptr<Stmt> else_body;
         void print(const std::string& prefix="", bool isLeft=false) const override;
+		std::string compile() const override;
     };
 
     class Stmts : public Stmt {
@@ -104,8 +113,8 @@ namespace AST {
         void add_stmt(std::unique_ptr<Stmt> stmt) {
             stmts.push_back(std::move(stmt));
         }
-        void print(const std::string& prefix="", bool isLeft=false) const override;
-    public:
+        void print(const std::string& prefix="", bool isLeft=false) const;
+		std::string compile() const;
         std::vector<std::unique_ptr<Stmt>> stmts;
     };
 }
