@@ -39,7 +39,30 @@ namespace AST {
         }
     }
 
-	void Compiler::compile(){
+    void Compiler::ast_gen_stmts(std::unique_ptr<Stmts> stmts) {
+        for (const auto& stmt : stmts->stmts) {
+            ast_gen_stmt(std::move(stmt))
+        }
+    }
+
+    void Compiler::ast_gen_stmt(std::unique_ptr<Stmt> stmt) {
+        if (EWhile *ewh = dynamic_cast<EWhile *>(stmt.get())) {
+            std::unique_ptr<EWhile> p_ewh(ewh);
+            ast_gen_while(std::move(p_ewh));
+        } else if (EIf *eif = dynamic_cast<EIf *>(stmt.get())) {
+            std::unique_ptr<EIf> p_eif(eif);
+            ast_gen_if(std::move(p_eif));
+        } else if (EAssign *eassgn = dynamic_cast<EAssign *>(stmt.get())) {
+            std::unique_ptr<EAssign> p_eassgn(eassgn);
+            ast_gen_assignment(std::move(p_eassgn));
+        }
+    }
+
+    void Compiler::ast_gen_while(std::unique_ptr<EWhile> s) {
+
+    }
+
+    void Compiler::compile(){
 		auto command = builder.stmts();
 		command->print();
 	}
