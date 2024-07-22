@@ -7,7 +7,7 @@
 class Reader {
 public:
     Reader(const std::string& filename);
-    bool readLine(std::string& line);
+	std::string readFile();
 
 private:
     std::ifstream file;

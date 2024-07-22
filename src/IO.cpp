@@ -7,11 +7,11 @@ Reader::Reader(const std::string& filename) {
     }
 }
 
-bool Reader::readLine(std::string& line) {
-    if (std::getline(file, line)) {
-        return true;
-    }
-    return false;
+std::string Reader::readFile() {
+	std::string content( (std::istreambuf_iterator<char>(file) ),
+						   (std::istreambuf_iterator<char>()    ) );
+	return content;
+
 }
 
 // Writer implementation

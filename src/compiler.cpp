@@ -1,7 +1,6 @@
 #include "compiler.h"
 #include <memory>
 #include <string>
-#include "ast_builder.h"
 
 namespace AST {
 	void Compiler::ast_gen_start() {
@@ -41,10 +40,7 @@ namespace AST {
     }
 
 	void Compiler::compile(){
-		while (reader.readLine(current_line)) {
-			AstBuilder builder(current_line);
-			auto command = builder.stmts();
-			command->print();
-		}
+		auto command = builder.stmts();
+		command->print();
 	}
 }
