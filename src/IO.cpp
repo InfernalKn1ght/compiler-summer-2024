@@ -14,6 +14,12 @@ std::string Reader::readFile() {
 
 }
 
+Reader::~Reader(){
+	if (file.is_open()){
+		file.close();
+	}
+}
+
 // Writer implementation
 Writer::Writer(const std::string& filename) {
     file.open(filename);
@@ -26,4 +32,10 @@ void Writer::writeLine(const std::string& line) {
     if (file.is_open()) {
         file << line << std::endl;
     }
+}
+
+Writer::~Writer(){
+	if (file.is_open()){
+		file.close();
+	}
 }

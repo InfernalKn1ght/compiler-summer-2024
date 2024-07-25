@@ -7,6 +7,7 @@
 class Reader {
 public:
     Reader(const std::string& filename);
+	~Reader();
 	std::string readFile();
 
 private:
@@ -16,6 +17,7 @@ private:
 class Writer {
 public:
     Writer(const std::string& filename);
+	~Writer();
     void writeLine(const std::string& line);
 
 private:
