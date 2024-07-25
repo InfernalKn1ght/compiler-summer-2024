@@ -10,7 +10,7 @@ namespace AST {
     }
 
 	std::string EConst::compile() const{
-		return "	li a0, " + std::to_string(val); 
+		return "	li t0, " + std::to_string(val) + "\n"; 
 	}
 
     void EVariable::print(const std::string& prefix, bool isLeft) const {
@@ -42,24 +42,24 @@ namespace AST {
 	std::string EBinOp::compile() const {
 		std::string result;
 		result.append(left->compile());
-		result.append("    addi sp, sp, -8");
-		result.append("    sd a0, (sp)");
+		result.append("    addi sp, sp, -8\n");
+		result.append("    sd t0, (sp)\n");
 		result.append(right->compile());
-		result.append("    ld a1, (sp)");
+		result.append("    ld t1, (sp)\n");
 
 		switch (op){
 			case PLUS:
-				result.append("    add a0, a0, a1");
+				result.append("    add t0, t0, t1\n");
 				break;
 			case MINUS:
-				result.append("    sub a0, a0, a1");
+				result.append("    sub t0, t0, t1\n");
 				break;
 			case MULTIPLICATION:
-				result.append("    mul a0, a0, a1");
+				result.append("    mul t0, t0, t1\n");
 				break;
 		}
 
-		result.append("    addi sp, sp, 8");
+		result.append("    addi sp, sp, 8\n");
 		return result;
 	}
 
@@ -92,8 +92,16 @@ namespace AST {
     }
 
 	std::string EWhile::compile() const {
-		//TODO
-		return "";
+        std::string result;
+
+        result.append("while_start1:\n");
+		result.append(condition->compile());
+        result.append("    blt zero, t0, while_start2\n");
+        result.append(body->compile());
+        result.append("    j lab1\n");
+        result.append("while_start2:\n");
+        
+		return result;
 	}
 
     void EIf::print(const std::string& prefix, bool isLeft) const {
@@ -107,8 +115,17 @@ namespace AST {
     }
 
 	std::string EIf::compile() const {
-		//TODO
-		return "";
+	    std::string result;
+
+        result.append(condition->compile());
+        result.append("    blt zero, t0, then_start1\n");
+        result.append(else_body->compile());
+        result.append("    j then_end1\n");
+        result.append("then_start1:\n");
+        result.append(then_body->compile());
+        result.append("then_end1:");
+
+		return result;
 	}
 
     void Stmts::print(const std::string& prefix, bool isLeft) const {
