@@ -98,10 +98,10 @@ namespace AST {
 
         result.append("while_start1:\n");
 		result.append(condition->compile());
-        result.append("	blt zero, t0, while_start2\n");
+        result.append("	blt zero, t0, while_end1\n");
         result.append(body->compile());
-        result.append("	j lab1\n");
-        result.append("while_start2:\n");
+        result.append("	j while_start1\n");
+        result.append("while_end1:\n");
         
 		return result;
 	}
