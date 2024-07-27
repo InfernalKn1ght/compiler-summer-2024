@@ -52,7 +52,7 @@ namespace AST {
 				result.append("	add t0, t0, t1\n");
 				break;
 			case MINUS:
-				result.append("	sub t0, t0, t1\n");
+				result.append("	sub t0, t1, t0\n");
 				break;
 			case MULTIPLICATION:
 				result.append("	mul t0, t0, t1\n");
