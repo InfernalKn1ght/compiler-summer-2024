@@ -5,17 +5,33 @@
 #include <cstddef>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <stdexcept>
 #include <string>
 
 namespace AST {
-std::unique_ptr<Expr> AstBuilder::brackets(){
+std::set<std::string> AstBuilder::aviable_registers = {
+	"s0",
+	"s1",
+	"s2",
+	"s3",
+	"s4",
+	"s5",
+	"s6",
+	"s7",
+	"s8",
+	"s9",
+	"s10",
+	"s11"
+};
+
+std::shared_ptr<Expr> AstBuilder::brackets(){
 	auto before_brackets_pos = p.get_pos();
 	try {
 		Bracket op = p.get_bracket();
 
 		if (op == LEFT_BRACKET) {
-			std::unique_ptr<Expr> head = expr();
+			std::shared_ptr<Expr> head = expr();
 			op = p.get_bracket();
 			if (op != RIGHT_BRACKET) {
 				throw std::logic_error("Invalid syntax: missing right bracket");
@@ -29,14 +45,14 @@ std::unique_ptr<Expr> AstBuilder::brackets(){
 	throw std::invalid_argument("Missing brackets");
 }
 
-std::unique_ptr<Expr> AstBuilder::prod() {
-	std::unique_ptr<Expr> head;
+std::shared_ptr<Expr> AstBuilder::prod() {
+	std::shared_ptr<Expr> head;
 
 	try {
 		head = std::make_unique<EConst>(p.get_const());
 	} catch (std::invalid_argument) {
 		try{
-			head = std::make_unique<EVariable>(p.get_variable());
+			head = get_variable_by_name(p.get_variable());
 		} catch (std::invalid_argument) {
 			head = brackets();
 		}
@@ -50,7 +66,7 @@ std::unique_ptr<Expr> AstBuilder::prod() {
 		if (op != Factorial) {
 			throw std::invalid_argument("Invalid unary operator");
 		}
-		head = std::make_unique<EUnaryOp>(
+		head = std::make_shared<EUnaryOp>(
 			std::move(head),
 			op
 		);
@@ -62,7 +78,7 @@ std::unique_ptr<Expr> AstBuilder::prod() {
 		BinaryOperator op = p.get_binary_operation();
 
 		if (op == MULTIPLICATION) {
-			head = std::make_unique<EBinOp>(
+			head = std::make_shared<EBinOp>(
 				std::move(head),
 				std::move(prod()),
 				op);
@@ -75,16 +91,16 @@ std::unique_ptr<Expr> AstBuilder::prod() {
 	return std::move(head);
 }
 
-std::unique_ptr<Expr> AstBuilder::expr() {
-	std::unique_ptr<Expr> left = prod();
+std::shared_ptr<Expr> AstBuilder::expr() {
+	std::shared_ptr<Expr> left = prod();
 
 	auto after_left_pos = p.get_pos();
 	try {
 		BinaryOperator op = p.get_binary_operation();
-		std::unique_ptr<EBinOp> new_root;
+		std::shared_ptr<EBinOp> new_root;
 
 		if (op == PLUS || op == MINUS) {
-			new_root = std::make_unique<EBinOp>(
+			new_root = std::make_shared<EBinOp>(
 				std::move(left),
 				std::move(expr()),
 				op);
@@ -100,7 +116,7 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
 	auto init_pos = p.get_pos();
 
     try {
-        std::unique_ptr<EVariable> ident = std::make_unique<EVariable>(p.get_variable());
+		std::shared_ptr<EVariable> variable = get_variable_by_name(p.get_variable());
         BinaryOperator op;
         try {
             op = p.get_binary_operation();
@@ -109,10 +125,10 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
         if (op != ASSIGMENT) {
             throw std::logic_error("Invalid syntax: missing assigment");
         }
-        std::unique_ptr<Expr> right = expr();
+        std::shared_ptr<Expr> right = expr();
         std::unique_ptr<EAssign> new_root = std::make_unique<EAssign>(
-            std::move(ident),
-            std::move(right));
+            variable,
+            right);
         return std::move(new_root);
     } catch (std::invalid_argument) {
     }
@@ -121,7 +137,7 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
     try {
         std::string external_key_word = p.get_keyword();
         if (external_key_word == "while") {
-            std::unique_ptr<Expr> result = expr();
+            std::shared_ptr<Expr> condition = expr();
 
 			std::string internal_key_word = p.get_keyword();
             if (internal_key_word != "do") {
@@ -138,11 +154,11 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
             }
 
             std::unique_ptr<EWhile> new_root = std::make_unique<EWhile>(
-                std::move(result),
+                std::move(condition),
                 std::move(while_body_stmts));
             return std::move(new_root);
         } else if (external_key_word == "if") {
-            std::unique_ptr<Expr> result = expr();
+            std::shared_ptr<Expr> condition = expr();
 
             std::string internal_key_word = p.get_keyword();
             if (internal_key_word != "then") {
@@ -160,14 +176,13 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
             if (external_key_word == "else") {
                 else_body_stmts = stmts();
 				external_key_word = p.get_keyword();
-				std::cout << external_key_word;
             }
 
             if (external_key_word != "fi") {
                 throw std::logic_error("Invalid syntax: missing fi keyword");
             }
             std::unique_ptr<EIf> new_root = std::make_unique<EIf>(
-                std::move(result),
+                std::move(condition),
                 std::move(if_body_stmts),
                 std::move(else_body_stmts));
             return std::move(new_root);
@@ -191,6 +206,23 @@ std::unique_ptr<Stmts> AstBuilder::stmts() {
         }
     }
     return stmts;
+}
+
+void AstBuilder::set_register(std::shared_ptr<EVariable> variable){
+	if (aviable_registers.size() == 0) throw std::logic_error("It is not possible to allocate a register for variable " + variable->name);
+	std::string poped_aviable_name = aviable_registers.extract(aviable_registers.begin()).value();
+	variable->register_name = poped_aviable_name;
+}
+
+std::shared_ptr<EVariable> AstBuilder::get_variable_by_name(std::string name){
+	for (auto& cur_var : variables){
+		if (cur_var->name == name) return cur_var;
+	}
+
+	std::shared_ptr<EVariable> new_variable = std::make_shared<EVariable>(name);
+	set_register(new_variable);
+	variables.insert(new_variable);
+	return new_variable;
 }
 
 }

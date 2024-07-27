@@ -14,7 +14,7 @@ namespace AST {
 	}
 
     void EVariable::print(const std::string& prefix, bool isLeft) const {
-        std::cout << prefix << (isLeft ? "├──" : "└──") << register_name << "\n";
+        std::cout << prefix << (isLeft ? "├──" : "└──") << name + "(" + register_name + ")" << "\n";
     }
 
 	std::string EVariable::compile() const{

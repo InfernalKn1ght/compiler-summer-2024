@@ -26,11 +26,10 @@ namespace AST {
 
     class EVariable : public Expr {
     public:
-        EVariable(std::string register_name, std::shared_ptr<EConst> value) :
-            value(value), register_name(register_name) {};
-        EVariable(std::string name) : value(nullptr), register_name(name) {};
-        std::shared_ptr<EConst> value;
+        EVariable(std::string name) : name(name) {};
+		std::string name;
         std::string register_name;
+		/* void set_register_name(std::string register_name){this->register_name = register_name;}; */
         void print(const std::string& prefix="", bool isLeft=false) const override;
 		std::string compile() const override; 
     };
@@ -51,10 +50,10 @@ namespace AST {
 
     class EBinOp : public EOperator {
     public:
-        EBinOp(std::unique_ptr<Expr> left, std::unique_ptr<Expr> right, BinaryOperator op) :
-            left(std::move(left)), right(std::move(right)), op(op) {};
-        std::unique_ptr<Expr> left;
-        std::unique_ptr<Expr> right;
+        EBinOp(std::shared_ptr<Expr> left, std::shared_ptr<Expr> right, BinaryOperator op) :
+            left(left), right(right), op(op) {};
+        std::shared_ptr<Expr> left;
+        std::shared_ptr<Expr> right;
         BinaryOperator op;
         void print(const std::string& prefix="", bool isLeft=false) const override;
 		std::string compile() const override;
@@ -62,9 +61,9 @@ namespace AST {
 
     class EUnaryOp : public EOperator {
     public:
-        EUnaryOp(std::unique_ptr<Expr> expression, UnaryOperator op) :
+        EUnaryOp(std::shared_ptr<Expr> expression, UnaryOperator op) :
             expression(std::move(expression)), op(op) {};
-        std::unique_ptr<Expr> expression;
+        std::shared_ptr<Expr> expression;
         UnaryOperator op;
         void print(const std::string& prefix="", bool isLeft=false) const override;
 		std::string compile() const override;
@@ -79,19 +78,19 @@ namespace AST {
 
     class EAssign : public Stmt {
     public:
-        EAssign(std::unique_ptr<EVariable> variable, std::unique_ptr<Expr> expr) :
-            variable(std::move(variable)), expr(std::move(expr)) {};
-        std::unique_ptr<EVariable> variable;
-        std::unique_ptr<Expr> expr;
+        EAssign(std::shared_ptr<EVariable> variable, std::shared_ptr<Expr> expr) :
+            variable(variable), expr(expr) {};
+        std::shared_ptr<EVariable> variable;
+		std::shared_ptr<Expr> expr;
         void print(const std::string& prefix="", bool isLeft=false) const override;
 		std::string compile() const override;
     };
 
     class EWhile : public Stmt {
     public:
-        EWhile(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body) :
-            condition(std::move(condition)), body(std::move(body)) {};
-        std::unique_ptr<Expr> condition;
+        EWhile(std::shared_ptr<Expr> condition, std::unique_ptr<Stmt> body) :
+            condition(condition), body(std::move(body)) {};
+        std::shared_ptr<Expr> condition;
         std::unique_ptr<Stmt> body;
         void print(const std::string& prefix="", bool isLeft=false) const override;
 		std::string compile() const override;
@@ -99,9 +98,9 @@ namespace AST {
 
     class EIf : public Stmt {
     public:
-        EIf(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> then_body, std::unique_ptr<Stmt> else_body) :
-            condition(std::move(condition)), then_body(std::move(then_body)), else_body(std::move(else_body)) {};
-        std::unique_ptr<Expr> condition;
+        EIf(std::shared_ptr<Expr> condition, std::unique_ptr<Stmt> then_body, std::unique_ptr<Stmt> else_body) :
+            condition(condition), then_body(std::move(then_body)), else_body(std::move(else_body)) {};
+        std::shared_ptr<Expr> condition;
         std::unique_ptr<Stmt> then_body;
         std::unique_ptr<Stmt> else_body;
         void print(const std::string& prefix="", bool isLeft=false) const override;
@@ -115,6 +114,7 @@ namespace AST {
         }
         void print(const std::string& prefix="", bool isLeft=false) const;
 		std::string compile() const;
+	private:
         std::vector<std::unique_ptr<Stmt>> stmts;
     };
 }

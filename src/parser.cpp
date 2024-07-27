@@ -86,7 +86,7 @@ namespace AST {
 		throw std::invalid_argument("String is not a keyword: " + str.substr(pos));
     };
 
-    const EVariable Parser::get_variable() {
+    const std::string Parser::get_variable() {
 		auto init_pos = pos;
         try {
             std::string result = get_keyword_or_ident();
