@@ -98,6 +98,7 @@ namespace AST {
         std::string result;
 
 		std::string nesting_level_str = std::to_string(nesting_level);
+		nesting_level++;
         result.append("while_st" + nesting_level_str + ":\n");
 		result.append(condition->compile());
         result.append("	beq t0, zero, while_end" + nesting_level_str + "\n");
@@ -123,6 +124,7 @@ namespace AST {
 	    std::string result;
 
 		std::string nesting_level_str = std::to_string(nesting_level);
+		nesting_level++;
         result.append(condition->compile());
         result.append("	beq t0, zero, else_st" + nesting_level_str + "\n");
         result.append(then_body->compile());
