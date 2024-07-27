@@ -103,7 +103,7 @@ namespace AST {
 		result.append(condition->compile());
         result.append("	beq t0, zero, while_end" + nesting_level_str + "\n");
         result.append(body->compile());
-        result.append("	j while_st" + nesting_level_str + ":\n");
+        result.append("	j while_st" + nesting_level_str + "\n");
         result.append("while_end" + nesting_level_str + ":\n");
         
 		return result;
