@@ -93,15 +93,17 @@ namespace AST {
         body->print(prefix + (isLeft ? "│   " : "    "), false);
     }
 
+	unsigned EWhile::nesting_level = 1;
 	std::string EWhile::compile() const {
         std::string result;
 
-        result.append("while_st1:\n");
+		std::string nesting_level_str = std::to_string(nesting_level);
+        result.append("while_st" + nesting_level_str + ":\n");
 		result.append(condition->compile());
-        result.append("	beq t0, zero, while_end1\n");
+        result.append("	beq t0, zero, while_end" + nesting_level_str + "\n");
         result.append(body->compile());
-        result.append("	j while_st1\n");
-        result.append("while_end1:\n");
+        result.append("	j while_st" + nesting_level_str + ":\n");
+        result.append("while_end" + nesting_level_str + ":\n");
         
 		return result;
 	}
@@ -116,16 +118,18 @@ namespace AST {
         }
     }
 
+	unsigned EIf::nesting_level = 1;
 	std::string EIf::compile() const {
 	    std::string result;
 
+		std::string nesting_level_str = std::to_string(nesting_level);
         result.append(condition->compile());
-        result.append("	beq t0, zero, else_st1\n");
+        result.append("	beq t0, zero, else_st" + nesting_level_str + "\n");
         result.append(then_body->compile());
-        result.append("	j else_end1\n");
-        result.append("else_st1:\n");
+        result.append("	j else_end" + nesting_level_str + "\n");
+        result.append("else_st" + nesting_level_str + ":\n");
         result.append(else_body->compile());
-        result.append("else_end1:");
+        result.append("else_end" + nesting_level_str + ":\n");
 
 		return result;
 	}

@@ -90,6 +90,7 @@ namespace AST {
     public:
         EWhile(std::shared_ptr<Expr> condition, std::unique_ptr<Stmt> body) :
             condition(condition), body(std::move(body)) {};
+		static unsigned nesting_level;
         std::shared_ptr<Expr> condition;
         std::unique_ptr<Stmt> body;
         void print(const std::string& prefix="", bool isLeft=false) const override;
@@ -100,6 +101,7 @@ namespace AST {
     public:
         EIf(std::shared_ptr<Expr> condition, std::unique_ptr<Stmt> then_body, std::unique_ptr<Stmt> else_body) :
             condition(condition), then_body(std::move(then_body)), else_body(std::move(else_body)) {};
+		static unsigned nesting_level;
         std::shared_ptr<Expr> condition;
         std::unique_ptr<Stmt> then_body;
         std::unique_ptr<Stmt> else_body;
