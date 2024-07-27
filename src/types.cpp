@@ -96,11 +96,11 @@ namespace AST {
 	std::string EWhile::compile() const {
         std::string result;
 
-        result.append("while_start1:\n");
+        result.append("while_st1:\n");
 		result.append(condition->compile());
-        result.append("	blt zero, t0, while_end1\n");
+        result.append("	beq t0, zero, while_end1\n");
         result.append(body->compile());
-        result.append("	j while_start1\n");
+        result.append("	j while_st1\n");
         result.append("while_end1:\n");
         
 		return result;
@@ -120,12 +120,12 @@ namespace AST {
 	    std::string result;
 
         result.append(condition->compile());
-        result.append("	blt zero, t0, then_start1\n");
-        result.append(else_body->compile());
-        result.append("	j then_end1\n");
-        result.append("then_start1:\n");
+        result.append("	beq t0, zero, else_st1\n");
         result.append(then_body->compile());
-        result.append("then_end1:");
+        result.append("	j else_end1\n");
+        result.append("else_st1:\n");
+        result.append(else_body->compile());
+        result.append("else_end1:");
 
 		return result;
 	}
