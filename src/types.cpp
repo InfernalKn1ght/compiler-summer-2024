@@ -18,7 +18,7 @@ namespace AST {
     }
 
 	std::string EVariable::compile() const{
-		return "	li a0, " + register_name; 
+		return "	mv t0, " + register_name + "\n"; 
 	}
 
     void EBinOp::print(const std::string& prefix, bool isLeft) const {
@@ -42,24 +42,24 @@ namespace AST {
 	std::string EBinOp::compile() const {
 		std::string result;
 		result.append(left->compile());
-		result.append("    addi sp, sp, -8\n");
-		result.append("    sd t0, (sp)\n");
+		result.append("	addi sp, sp, -8\n");
+		result.append("	sd t0, (sp)\n");
 		result.append(right->compile());
-		result.append("    ld t1, (sp)\n");
+		result.append("	ld t1, (sp)\n");
 
 		switch (op){
 			case PLUS:
-				result.append("    add t0, t0, t1\n");
+				result.append("	add t0, t0, t1\n");
 				break;
 			case MINUS:
-				result.append("    sub t0, t0, t1\n");
+				result.append("	sub t0, t0, t1\n");
 				break;
 			case MULTIPLICATION:
-				result.append("    mul t0, t0, t1\n");
+				result.append("	mul t0, t0, t1\n");
 				break;
 		}
 
-		result.append("    addi sp, sp, 8\n");
+		result.append("	addi sp, sp, 8\n");
 		return result;
 	}
 
@@ -81,8 +81,10 @@ namespace AST {
     }
 
 	std::string EAssign::compile() const{
-		//TODO
-		return "";
+		std::string result;
+		result.append(expr->compile());
+		result.append("	mv " + variable->register_name + ", t0\n");
+		return result;
 	}
 
     void EWhile::print(const std::string& prefix, bool isLeft) const {
@@ -96,9 +98,9 @@ namespace AST {
 
         result.append("while_start1:\n");
 		result.append(condition->compile());
-        result.append("    blt zero, t0, while_start2\n");
+        result.append("	blt zero, t0, while_start2\n");
         result.append(body->compile());
-        result.append("    j lab1\n");
+        result.append("	j lab1\n");
         result.append("while_start2:\n");
         
 		return result;
@@ -118,9 +120,9 @@ namespace AST {
 	    std::string result;
 
         result.append(condition->compile());
-        result.append("    blt zero, t0, then_start1\n");
+        result.append("	blt zero, t0, then_start1\n");
         result.append(else_body->compile());
-        result.append("    j then_end1\n");
+        result.append("	j then_end1\n");
         result.append("then_start1:\n");
         result.append(then_body->compile());
         result.append("then_end1:");

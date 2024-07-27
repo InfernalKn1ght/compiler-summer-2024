@@ -11,7 +11,6 @@
 
 namespace AST {
 std::set<std::string> AstBuilder::aviable_registers = {
-	"s0",
 	"s1",
 	"s2",
 	"s3",
