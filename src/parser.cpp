@@ -110,8 +110,9 @@ namespace AST {
 			case '+':
 			case '-':
 			case '*':
-			case '(':
-			case ')':
+            case '<':
+            case '>':
+            case '=':
 				pos++;
 				return BinaryOperator(symbol);
 			default:
@@ -123,7 +124,17 @@ namespace AST {
 			return ASSIGMENT;
 		}
 
-		throw std::invalid_argument("String is not a operator: " + str.substr(pos));
+        if (str.substr(pos, 3) == "and") {
+            pos += 3;
+            return AND;
+        }
+
+        if (str.substr(pos, 2) == "or") {
+            pos += 2;
+            return OR;
+        }
+
+		throw std::invalid_argument("String is not an operator: " + str.substr(pos));
 	}
 
     const UnaryOperator Parser::get_unary_operation() {

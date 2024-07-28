@@ -37,7 +37,12 @@ namespace AST {
     enum BinaryOperator { PLUS = '+',
                           MINUS = '-',
                           MULTIPLICATION = '*',
-                          ASSIGMENT = '='
+                          ASSIGMENT,
+                          AND,
+                          OR,
+                          LESS = '<',
+                          GREATER = '>',
+                          EQUAL = '='
 	};
 
 	enum Bracket {
