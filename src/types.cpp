@@ -10,7 +10,7 @@ namespace AST {
     }
 
 	std::string EConst::compile() const{
-		return "	li t0, " + std::to_string(val) + "\n"; 
+		return "\tli t0, " + std::to_string(val) + "\n"; 
 	}
 
     void EVariable::print(const std::string& prefix, bool isLeft) const {
@@ -18,7 +18,7 @@ namespace AST {
     }
 
 	std::string EVariable::compile() const{
-		return "	mv t0, " + register_name + "\n"; 
+		return "\tmv t0, " + register_name + "\n"; 
 	}
 
     void EBinOp::print(const std::string& prefix, bool isLeft) const {
@@ -93,7 +93,7 @@ namespace AST {
 				break;
             case OR:
 				result.append("\tor t0, t0, t1\n");
-                result.append("\tbeq t1, zero, or_st1\n");
+                result.append("\tbeq t0, zero, or_st1\n");
                 result.append("\tli t0, 1\n");
                 result.append("\tj or_end1\n");
                 result.append("or_st1:\n");
@@ -102,7 +102,7 @@ namespace AST {
 				break;
 		}
 
-		result.append("	addi sp, sp, 8\n");
+		result.append("\taddi sp, sp, 8\n");
 		return result;
 	}
 
