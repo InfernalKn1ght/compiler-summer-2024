@@ -17,6 +17,10 @@ class AstBuilder {
 		std::shared_ptr<Expr> brackets();
 		std::unique_ptr<Stmt> stmt();
 		std::shared_ptr<Expr> expr();
+		std::shared_ptr<Expr> sum();
+		std::shared_ptr<Expr> comp();
+		std::shared_ptr<Expr> logic_or();
+		std::shared_ptr<Expr> logic_and();
 
 
 	public:

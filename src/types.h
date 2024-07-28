@@ -37,9 +37,9 @@ namespace AST {
     enum BinaryOperator { PLUS = '+',
                           MINUS = '-',
                           MULTIPLICATION = '*',
-                          ASSIGMENT,
-                          AND,
-                          OR,
+                          ASSIGMENT = 128,
+                          AND = 129,
+                          OR = 130,
                           LESS = '<',
                           GREATER = '>',
                           EQUAL = '='

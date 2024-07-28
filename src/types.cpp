@@ -30,6 +30,16 @@ namespace AST {
                     return "-";
                 case MULTIPLICATION:
                     return "*";
+                case LESS:
+                    return "<";
+                case GREATER:
+                    return ">";
+                case EQUAL:
+                    return "=";
+                case AND:
+                    return "and";
+                case OR:
+                    return "or";
                 default:
                     return "";
             }
@@ -42,20 +52,36 @@ namespace AST {
 	std::string EBinOp::compile() const {
 		std::string result;
 		result.append(left->compile());
-		result.append("	addi sp, sp, -8\n");
-		result.append("	sd t0, (sp)\n");
+		result.append("\taddi sp, sp, -8\n");
+		result.append("\tsd t0, (sp)\n");
 		result.append(right->compile());
-		result.append("	ld t1, (sp)\n");
+		result.append("\tld t1, (sp)\n");
 
 		switch (op){
 			case PLUS:
-				result.append("	add t0, t0, t1\n");
+				result.append("\tadd t0, t0, t1\n");
 				break;
 			case MINUS:
-				result.append("	sub t0, t1, t0\n");
+				result.append("\tsub t0, t1, t0\n");
 				break;
 			case MULTIPLICATION:
-				result.append("	mul t0, t0, t1\n");
+				result.append("\tmul t0, t0, t1\n");
+				break;
+            case LESS:
+				result.append("\tslt t0, t1, t0\n");
+				break;
+            case GREATER:
+				result.append("\tslt t0, t0, t1\n");
+				break;
+            case EQUAL:
+				result.append("\tsub t0, t1, t0\n");
+                result.append("\tnot t0, t0\n");
+				break;
+            case AND:
+				result.append("\tand t0, t0, t1\n");
+				break;
+            case OR:
+				result.append("\tor t0, t0, t1\n");
 				break;
 		}
 

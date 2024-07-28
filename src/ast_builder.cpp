@@ -90,7 +90,7 @@ std::shared_ptr<Expr> AstBuilder::prod() {
 	return std::move(head);
 }
 
-std::shared_ptr<Expr> AstBuilder::expr() {
+std::shared_ptr<Expr> AstBuilder::sum() {
 	std::shared_ptr<Expr> left = prod();
 
 	auto after_left_pos = p.get_pos();
@@ -101,7 +101,7 @@ std::shared_ptr<Expr> AstBuilder::expr() {
 		if (op == PLUS || op == MINUS) {
 			new_root = std::make_shared<EBinOp>(
 				std::move(left),
-				std::move(expr()),
+				std::move(sum()),
 				op);
 			return std::move(new_root);
 		}
@@ -109,6 +109,73 @@ std::shared_ptr<Expr> AstBuilder::expr() {
 	}
 	p.set_pos(after_left_pos);
 	return std::move(left);
+}
+
+std::shared_ptr<Expr> AstBuilder::comp() {
+	std::shared_ptr<Expr> left = sum();
+
+	auto after_left_pos = p.get_pos();
+	try {
+		BinaryOperator op = p.get_binary_operation();
+		std::shared_ptr<EBinOp> new_root;
+
+		if (op == LESS || op == GREATER || op == EQUAL) {
+			new_root = std::make_shared<EBinOp>(
+				std::move(left),
+				std::move(comp()),
+				op);
+			return std::move(new_root);
+		}
+	} catch (std::invalid_argument &e) {
+	}
+	p.set_pos(after_left_pos);
+	return std::move(left);
+}
+
+std::shared_ptr<Expr> AstBuilder::logic_and() {
+	std::shared_ptr<Expr> left = comp();
+
+	auto after_left_pos = p.get_pos();
+	try {
+		BinaryOperator op = p.get_binary_operation();
+		std::shared_ptr<EBinOp> new_root;
+
+		if (op == AND) {
+			new_root = std::make_shared<EBinOp>(
+				std::move(left),
+				std::move(logic_and()),
+				op);
+			return std::move(new_root);
+		}
+	} catch (std::invalid_argument &e) {
+	}
+	p.set_pos(after_left_pos);
+	return std::move(left);
+}
+
+std::shared_ptr<Expr> AstBuilder::logic_or() {
+	std::shared_ptr<Expr> left = logic_and();
+
+	auto after_left_pos = p.get_pos();
+	try {
+		BinaryOperator op = p.get_binary_operation();
+		std::shared_ptr<EBinOp> new_root;
+
+		if (op == OR) {
+			new_root = std::make_shared<EBinOp>(
+				std::move(left),
+				std::move(logic_or()),
+				op);
+			return std::move(new_root);
+		}
+	} catch (std::invalid_argument &e) {
+	}
+	p.set_pos(after_left_pos);
+	return std::move(left);
+}
+
+std::shared_ptr<Expr> AstBuilder::expr() {
+	return std::move(logic_or());
 }
 
 std::unique_ptr<Stmt> AstBuilder::stmt() {
