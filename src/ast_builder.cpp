@@ -169,7 +169,7 @@ std::unique_ptr<Stmt> AstBuilder::stmt() {
 				if_body_stmts = stmts();
 			} catch (std::invalid_argument) {
 			}
-            std::unique_ptr<Stmt> else_body_stmts;
+            std::unique_ptr<Stmts> else_body_stmts = std::make_unique<Stmts>();
 
 			std::string external_key_word = p.get_keyword();
             if (external_key_word == "else") {
