@@ -74,14 +74,31 @@ namespace AST {
 				result.append("\tslt t0, t0, t1\n");
 				break;
             case EQUAL:
-				result.append("\tsub t0, t1, t0\n");
-                result.append("\tnot t0, t0\n");
+				result.append("\txor t0, t1, t0\n");
+                result.append("\tbne t0, zero, eq_st1\n");
+                result.append("\tli t0, 1\n");
+                result.append("\tj eq_end1\n");
+                result.append("eq_st1:\n");
+                result.append("\tmv t0, zero\n");
+                result.append("eq_end1:\n");
 				break;
             case AND:
-				result.append("\tand t0, t0, t1\n");
+                result.append("\tbeq t0, zero, and_st1\n");
+                result.append("\tbeq t1, zero, and_st1\n");
+                result.append("\tli t0, 1\n");
+                result.append("\tj and_end1\n");
+                result.append("and_st1:\n");
+                result.append("\tmv t0, zero\n");
+                result.append("and_end1:\n");
 				break;
             case OR:
 				result.append("\tor t0, t0, t1\n");
+                result.append("\tbeq t1, zero, or_st1\n");
+                result.append("\tli t0, 1\n");
+                result.append("\tj or_end1\n");
+                result.append("or_st1:\n");
+                result.append("\tmv t0, zero\n");
+                result.append("or_end1:\n");
 				break;
 		}
 
@@ -127,9 +144,9 @@ namespace AST {
 		nesting_level++;
         result.append("while_st" + nesting_level_str + ":\n");
 		result.append(condition->compile());
-        result.append("	beq t0, zero, while_end" + nesting_level_str + "\n");
+        result.append("\tbeq t0, zero, while_end" + nesting_level_str + "\n");
         result.append(body->compile());
-        result.append("	j while_st" + nesting_level_str + "\n");
+        result.append("\tj while_st" + nesting_level_str + "\n");
         result.append("while_end" + nesting_level_str + ":\n");
         
 		return result;
@@ -152,9 +169,9 @@ namespace AST {
 		std::string nesting_level_str = std::to_string(nesting_level);
 		nesting_level++;
         result.append(condition->compile());
-        result.append("	beq t0, zero, else_st" + nesting_level_str + "\n");
+        result.append("\tbeq t0, zero, else_st" + nesting_level_str + "\n");
         result.append(then_body->compile());
-        result.append("	j else_end" + nesting_level_str + "\n");
+        result.append("\tj else_end" + nesting_level_str + "\n");
         result.append("else_st" + nesting_level_str + ":\n");
         result.append(else_body->compile());
         result.append("else_end" + nesting_level_str + ":\n");

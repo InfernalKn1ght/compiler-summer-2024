@@ -9,8 +9,9 @@ namespace AST {
     }
 
     void Compiler::ast_gen_end() { // Temporary function. Later replace with converting integer to string
-        writer.writeLine("	li a7, 93");
-        writer.writeLine("	ecall");
+	    writer.writeLine("\tmv a0, s1\n");
+        writer.writeLine("\tli a7, 93");
+        writer.writeLine("\tecall");
     }
 
     void Compiler::compile(){
