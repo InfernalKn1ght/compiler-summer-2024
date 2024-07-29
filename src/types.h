@@ -91,29 +91,6 @@ namespace AST {
 		std::string compile() const override;
     };
 
-    class EWhile : public Stmt {
-    public:
-        EWhile(std::shared_ptr<Expr> condition, std::unique_ptr<Stmt> body) :
-            condition(condition), body(std::move(body)) {};
-		static unsigned nesting_level;
-        std::shared_ptr<Expr> condition;
-        std::unique_ptr<Stmt> body;
-        void print(const std::string& prefix="", bool isLeft=false) const override;
-		std::string compile() const override;
-    };
-
-    class EIf : public Stmt {
-    public:
-        EIf(std::shared_ptr<Expr> condition, std::unique_ptr<Stmt> then_body, std::unique_ptr<Stmt> else_body) :
-            condition(condition), then_body(std::move(then_body)), else_body(std::move(else_body)) {};
-		static unsigned nesting_level;
-        std::shared_ptr<Expr> condition;
-        std::unique_ptr<Stmt> then_body;
-        std::unique_ptr<Stmt> else_body;
-        void print(const std::string& prefix="", bool isLeft=false) const override;
-		std::string compile() const override;
-    };
-
     class Stmts : public Stmt {
     public:
         void add_stmt(std::unique_ptr<Stmt> stmt) {
@@ -121,7 +98,32 @@ namespace AST {
         }
         void print(const std::string& prefix="", bool isLeft=false) const;
 		std::string compile() const;
+		std::size_t size() const;
 	private:
         std::vector<std::unique_ptr<Stmt>> stmts;
     };
+
+    class EWhile : public Stmt {
+    public:
+        EWhile(std::shared_ptr<Expr> condition, std::unique_ptr<Stmts> body) :
+            condition(condition), body(std::move(body)) {};
+		static unsigned nesting_level;
+        std::shared_ptr<Expr> condition;
+        std::unique_ptr<Stmts> body;
+        void print(const std::string& prefix="", bool isLeft=false) const override;
+		std::string compile() const override;
+    };
+
+    class EIf : public Stmt {
+    public:
+        EIf(std::shared_ptr<Expr> condition, std::unique_ptr<Stmts> then_body, std::unique_ptr<Stmts> else_body) :
+            condition(condition), then_body(std::move(then_body)), else_body(std::move(else_body)) {};
+		static unsigned nesting_level;
+        std::shared_ptr<Expr> condition;
+        std::unique_ptr<Stmts> then_body;
+        std::unique_ptr<Stmts> else_body;
+        void print(const std::string& prefix="", bool isLeft=false) const override;
+		std::string compile() const override;
+    };
+
 }

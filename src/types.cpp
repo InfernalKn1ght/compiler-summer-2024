@@ -14,7 +14,7 @@ namespace AST {
 	}
 
     void EVariable::print(const std::string& prefix, bool isLeft) const {
-        std::cout << prefix << (isLeft ? "├──" : "└──") << name + "(" + register_name + ")" << "\n";
+        std::cout << prefix << (isLeft ? "├──" : "└──") << name << "\n";
     }
 
 	std::string EVariable::compile() const{
@@ -156,7 +156,7 @@ namespace AST {
         std::cout << prefix << (isLeft ? "├──" : "└──") << "If" << "\n";
         condition->print(prefix + (isLeft ? "│   " : "    "), true);
         then_body->print(prefix + (isLeft ? "│   " : "    "), true);
-        if (else_body != nullptr) {
+        if (else_body->size() != 0) {
             std::cout << prefix << (isLeft ? "├──" : "└──") << "Else" << "\n";
             else_body->print(prefix + (isLeft ? "│   " : "    "), false);
         }
@@ -191,5 +191,9 @@ namespace AST {
 			result.append(stmt->compile());
         }
 		return result;
+	}
+
+	std::size_t Stmts::size() const {
+		return stmts.size();
 	}
 }

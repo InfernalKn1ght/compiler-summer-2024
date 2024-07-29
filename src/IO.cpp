@@ -30,7 +30,7 @@ Writer::Writer(const std::string& filename) {
 
 void Writer::writeLine(const std::string& line) {
     if (file.is_open()) {
-        file << line << std::endl;
+        file << line;
     }
 }
 
