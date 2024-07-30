@@ -49,8 +49,13 @@ namespace AST {
         right->print(prefix + (isLeft ? "│   " : "    "), false);
     }
 
+    unsigned EBinOp::nesting_level = 1;
 	std::string EBinOp::compile() const {
 		std::string result;
+
+        std::string nesting_level_str = std::to_string(nesting_level);
+		nesting_level++;
+
 		result.append(left->compile());
 		result.append("\taddi sp, sp, -8\n");
 		result.append("\tsd t0, (sp)\n");
@@ -75,30 +80,30 @@ namespace AST {
 				break;
             case EQUAL:
 				result.append("\txor t0, t1, t0\n");
-                result.append("\tbne t0, zero, eq_st1\n");
+                result.append("\tbne t0, zero, eq_st" + nesting_level_str + "\n");
                 result.append("\tli t0, 1\n");
-                result.append("\tj eq_end1\n");
-                result.append("eq_st1:\n");
+                result.append("\tj eq_end" + nesting_level_str + "\n");
+                result.append("eq_st" + nesting_level_str + ":\n");
                 result.append("\tmv t0, zero\n");
-                result.append("eq_end1:\n");
+                result.append("eq_end" + nesting_level_str + ":\n");
 				break;
             case AND:
-                result.append("\tbeq t0, zero, and_st1\n");
-                result.append("\tbeq t1, zero, and_st1\n");
+                result.append("\tbeq t0, zero, and_st" + nesting_level_str + "\n");
+                result.append("\tbeq t1, zero, and_st" + nesting_level_str + "\n");
                 result.append("\tli t0, 1\n");
-                result.append("\tj and_end1\n");
-                result.append("and_st1:\n");
+                result.append("\tj and_end" + nesting_level_str + "\n");
+                result.append("and_st" + nesting_level_str + ":\n");
                 result.append("\tmv t0, zero\n");
-                result.append("and_end1:\n");
+                result.append("and_end" + nesting_level_str + ":\n");
 				break;
             case OR:
 				result.append("\tor t0, t0, t1\n");
-                result.append("\tbeq t0, zero, or_st1\n");
+                result.append("\tbeq t0, zero, or_st" + nesting_level_str + "\n");
                 result.append("\tli t0, 1\n");
-                result.append("\tj or_end1\n");
-                result.append("or_st1:\n");
+                result.append("\tj or_end" + nesting_level_str + "\n");
+                result.append("or_st" + nesting_level_str + ":\n");
                 result.append("\tmv t0, zero\n");
-                result.append("or_end1:\n");
+                result.append("or_end" + nesting_level_str + ":\n");
 				break;
 		}
 

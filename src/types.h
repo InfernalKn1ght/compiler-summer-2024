@@ -57,6 +57,7 @@ namespace AST {
     public:
         EBinOp(std::shared_ptr<Expr> left, std::shared_ptr<Expr> right, BinaryOperator op) :
             left(left), right(right), op(op) {};
+        static unsigned nesting_level;
         std::shared_ptr<Expr> left;
         std::shared_ptr<Expr> right;
         BinaryOperator op;
